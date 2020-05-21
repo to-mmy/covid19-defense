@@ -10,6 +10,7 @@
 #include <vector>
 
 Map* buildMapFromFile(const std::string& file_name);
+sf::Vector2f getCellPositionFromCoordinates(const Coordinates& coords, const float& side_flt);
 
 int main()
 {
@@ -91,6 +92,10 @@ int main()
         }
     }
 
+    // Enemy sprite
+    sf::CircleShape circle(side_flt / 2.f);
+    circle.setPosition(getCellPositionFromCoordinates(game_map->getStartCoords(), side_flt));
+
     // Render loop
     while (window.isOpen())
     {
@@ -107,6 +112,7 @@ int main()
                 window.draw(cell_shape_array[i][j]);
             }
         }
+        window.draw(circle);
         window.display();
     }
 
@@ -207,4 +213,8 @@ Map* buildMapFromFile(const std::string& file_name) {
     fin.close();
     return new_map;
 
+}
+
+sf::Vector2f getCellPositionFromCoordinates(const Coordinates& coords, const float& side_flt) {
+    return sf::Vector2f(static_cast<float>(coords.col) * side_flt, static_cast<float>(coords.row) * side_flt);
 }

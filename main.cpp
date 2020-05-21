@@ -228,6 +228,9 @@ sf::Vector2f getCellPositionFromCoordinates(const Coordinates& coords, const flo
 
 sf::Vector2f normalize(const sf::Vector2f& vec) {
     float magnitude = sqrt((vec.x * vec.x) + (vec.y * vec.y));
+    if (magnitude == 0.f) {
+        return vec;
+    }
     return sf::Vector2f(vec.x / magnitude, vec.y / magnitude);
 
 }

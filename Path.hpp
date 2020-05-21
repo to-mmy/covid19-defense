@@ -16,6 +16,8 @@ public:
     void setNext(unsigned r, unsigned c) { next_path.row = r; next_path.col = c; }
     void setNext(Coordinates n) { next_path = n; }
 
+    Coordinates getNextCoords { return next_path; }
+
     virtual CellEnum getCellType() const override { return cellType; }
 };
 

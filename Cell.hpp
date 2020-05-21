@@ -20,6 +20,8 @@ public:
 
     void setCoords(unsigned r, unsigned c) { coords.row = r; coords.col = c; }
 
+    Coordinates getCoords() const { return coords; }
+
     virtual CellEnum getCellType() const = 0;
 };
 

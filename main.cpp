@@ -94,7 +94,8 @@ int main()
 
     // Enemy sprite
     sf::CircleShape circle(side_flt / 2.f);
-    circle.setPosition(getCellPositionFromCoordinates(game_map->getStartCoords(), side_flt));
+    Coordinates circle_coords = game_map->getStartCoords();
+    circle.setPosition(getCellPositionFromCoordinates(circle_coords, side_flt));
 
     // Render loop
     while (window.isOpen())

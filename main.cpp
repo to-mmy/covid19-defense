@@ -97,6 +97,11 @@ int main()
     Coordinates circle_coords = game_map->getStartCoords();
     circle.setPosition(getCellPositionFromCoordinates(circle_coords, side_flt));
 
+    Path* path_ptr = dynamic_cast<Path*>(game_map->getCells()[circle_coords.row][circle_coords.col]);
+
+    circle.setPosition(getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt));
+
+
     // Render loop
     while (window.isOpen())
     {

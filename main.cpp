@@ -7,10 +7,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
+#include <cmath>
 
 Map* buildMapFromFile(const std::string& file_name);
 sf::Vector2f getCellPositionFromCoordinates(const Coordinates& coords, const float& side_flt);
+sf::Vector2f normalize(const sf::Vector2f& vec);
 
 int main()
 {
@@ -223,4 +224,10 @@ Map* buildMapFromFile(const std::string& file_name) {
 
 sf::Vector2f getCellPositionFromCoordinates(const Coordinates& coords, const float& side_flt) {
     return sf::Vector2f(static_cast<float>(coords.col) * side_flt, static_cast<float>(coords.row) * side_flt);
+}
+
+sf::Vector2f normalize(const sf::Vector2f& vec) {
+    float magnitude = sqrt((vec.x * vec.x) + (vec.y * vec.y));
+    return sf::Vector2f(vec.x / magnitude, vec.y / magnitude);
+
 }

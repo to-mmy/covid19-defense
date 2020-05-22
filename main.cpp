@@ -65,6 +65,9 @@ int main()
 
     Map* game_map = buildMapFromFile(std::string("map.txt"));
 
+    // get the 2D Cell* array
+    Cell*** map_cells = game_map->getCells();
+
     // Make our SFML window
     const unsigned side_pix = 50; // the length of a side of a cell of the map in pixels
     const float side_flt = 50.f;
@@ -84,7 +87,7 @@ int main()
         for (unsigned j = 0; j < side_len; ++j) {
             cell_shape_array[i][j].setSize(sf::Vector2f(side_flt, side_flt));
             cell_shape_array[i][j].setPosition(static_cast<float>(j) * side_flt, static_cast<float>(i) * side_flt);
-            if (game_map->getCells()[i][j]->getCellType() == CellEnum::GROUND) {
+            if (map_cells[i][j]->getCellType() == CellEnum::GROUND) {
                 cell_shape_array[i][j].setFillColor(sf::Color(0, 255, 0));
             }
             else {
@@ -98,9 +101,16 @@ int main()
     Coordinates circle_coords = game_map->getStartCoords();
     circle.setPosition(getCellPositionFromCoordinates(circle_coords, side_flt));
 
-    Path* path_ptr = dynamic_cast<Path*>(game_map->getCells()[circle_coords.row][circle_coords.col]);
+    Path* path_ptr = dynamic_cast<Path*>(map_cells[circle_coords.row][circle_coords.col]);
 
-    circle.setPosition(getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt));
+    const float circle_speed = 0.05f;
+
+    sf::Vector2f circle_direction;
+    sf::Vector2f circle_destination = getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt);
+    sf::Vector2f distance_to_destination(std::abs(circle_destination.x - circle.getPosition().x), std::abs(circle_destination.y - circle.getPosition().y));
+
+    bool draw_circle = true;
+    //circle.setPosition(getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt));
 
 
     // Render loop
@@ -113,13 +123,37 @@ int main()
                 window.close();
         }
 
+        if (draw_circle) {
+            // Check if the circle has made it to next path
+            distance_to_destination = sf::Vector2f(abs(circle_destination.x - circle.getPosition().x), abs(circle_destination.y - circle.getPosition().y));
+            if (std::abs(distance_to_destination.x) < 1.f && std::abs(distance_to_destination.y) < 1.f) {
+                circle_coords = path_ptr->getNextCoords();
+                path_ptr = dynamic_cast<Path*>(map_cells[circle_coords.row][circle_coords.col]);
+                circle_destination = getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt);
+                // Check if circle has made it to the end
+                if (path_ptr->getNextCoords() == game_map->getExitCoords()) {
+                    draw_circle = false;
+                }
+            }
+
+
+            // Move the circle
+            circle_direction = normalize(circle_destination - circle.getPosition());
+            circle.move(circle_speed * circle_direction);
+        }
+
+
+
+        // Draw
         window.clear();
         for (unsigned i = 0; i < side_len; ++i) {
             for (unsigned j = 0; j < side_len; ++j) {
                 window.draw(cell_shape_array[i][j]);
             }
         }
-        window.draw(circle);
+        if (draw_circle) {
+            window.draw(circle);
+        }
         window.display();
     }
 

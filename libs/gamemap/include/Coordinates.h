@@ -1,5 +1,6 @@
-#ifndef COORDINATES_HPP
-#define COORDINATES_HPP
+#ifndef COORDINATES_H_INCLUDED
+#define COORDINATES_H_INCLUDED
+
 #include <string>
 
 struct Coordinates {
@@ -20,4 +21,4 @@ struct Coordinates {
     }
 };
 
-#endif // COORDINATES_HPP
+#endif // COORDINATES_H_INCLUDED

@@ -1,6 +1,9 @@
-#include "Map.hpp"
-#include "Ground.hpp"
+#include "Map.h"
+#include "Ground.h"
 
+// Constructor for Map, default for size is 8 as stated in Map.h
+// Builds a dynamically-allocated 2-D array of Cell pointers, all pointing to
+// Ground objects. Each cell holds its location in the array as its coordinates
 Map::Map(unsigned size) : side_length(size), start_coords(0,0), exit_coords(size, size) {
     cells = new Cell**[side_length];
     for (unsigned i = 0; i < side_length; ++i) {
@@ -10,7 +13,6 @@ Map::Map(unsigned size) : side_length(size), start_coords(0,0), exit_coords(size
             cells[i][j] = new Ground(i,j);
         }
     }
-    //exit_coords = { side_length, side_length }; // invalid sentinel value, will need to be set
 }
 
 Map::~Map() {

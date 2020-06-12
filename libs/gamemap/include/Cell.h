@@ -1,7 +1,8 @@
-#ifndef CELL_HPP
-#define CELL_HPP
-#include "Coordinates.hpp"
-#include "CellEnum.hpp"
+#ifndef CELL_H
+#define CELL_H
+
+#include "Coordinates.h"
+#include "CellEnum.h"
 
 class Cell {
 protected:
@@ -18,11 +19,14 @@ public:
 
     virtual ~Cell() = default;
 
-    void setCoords(unsigned r, unsigned c) { coords.row = r; coords.col = c; }
+    // Setter, non-overrideable
+    virtual void setCoords(unsigned r, unsigned c) final { coords.row = r; coords.col = c; }
 
-    Coordinates getCoords() const { return coords; }
+    // Getter, non-overrideable
+    virtual Coordinates getCoords() const final { return coords; }
 
+    // pure virtual getter
     virtual CellEnum getCellType() const = 0;
 };
 
-#endif // CELL_HPP
+#endif // CELL_H

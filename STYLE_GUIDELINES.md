@@ -19,6 +19,8 @@
   - e.g. `fooBar`
 - Types such as classes should begin with an upper case letter.
   - e.g. `FooBar`
+- Namespaces should begin with a lower case letter, and words should be separated by underscores.
+  - e.g. foo_bar
 - Constants and macros should be all caps with words separated by underscores.
   - e.g. `FOO_BAR`
 

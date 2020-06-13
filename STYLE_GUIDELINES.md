@@ -19,12 +19,14 @@
   - e.g. `fooBar`
 - Types such as classes should begin with an upper case letter.
   - e.g. `FooBar`
+- Namespaces should begin with a lower case letter, and words should be separated by underscores.
+  - e.g. `foo_bar`
 - Constants and macros should be all caps with words separated by underscores.
   - e.g. `FOO_BAR`
 
 [to top](#top)
 
-### <a name="nameGuide></a>Naming Guidelines
+### <a name="nameGuide"></a>Naming Guidelines
 - Names should be descriptive and in English.
   - The variable's use should be apparent from the name. The name should be easy to type without looking up how it is spelled.
   - Exception: Loop variables/variables with a short scope (less than 5 lines) are exempt as long as their purpose is obvious.
@@ -104,6 +106,7 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
 - Only one externally visible function per header file.
 - Class and function declarations and implementations should be split into header and source files respectively.
   - The header and source files should have the same name, differing only by file extension.
+  - Exception: function implementations may be put in the header file if they are one line.
 
 [to top](#top)
 
@@ -147,6 +150,7 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
 - Avoid macros.
   - Replace with constants, enumerations, inline functions, or lambdas.
 - If a value is to be used more than once, use a constant instead of literals.
+- Use C++ style casting not C style casting.
 - Use prefix increment/decrement instead of postfix increment/decrement when the value of the variable is not used.
   - For class objects, the postfix operation has to keep a temporary return value of the object before changing the object. It is a good habit to get into to use prefix increment/decrement at all times.
   - e.g. `for (auto iter = myVector.cbegin(); iter != myVector.cend(); ++iter)` instead of `iter++`.

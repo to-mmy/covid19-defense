@@ -26,7 +26,7 @@
 
 [to top](#top)
 
-### <a name="nameGuide></a>Naming Guidelines
+### <a name="nameGuide"></a>Naming Guidelines
 - Names should be descriptive and in English.
   - The variable's use should be apparent from the name. The name should be easy to type without looking up how it is spelled.
   - Exception: Loop variables/variables with a short scope (less than 5 lines) are exempt as long as their purpose is obvious.

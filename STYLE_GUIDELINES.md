@@ -147,6 +147,7 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
 - Avoid macros.
   - Replace with constants, enumerations, inline functions, or lambdas.
 - If a value is to be used more than once, use a constant instead of literals.
+- Use C++ style casting not C style casting.
 - Use prefix increment/decrement instead of postfix increment/decrement when the value of the variable is not used.
   - For class objects, the postfix operation has to keep a temporary return value of the object before changing the object. It is a good habit to get into to use prefix increment/decrement at all times.
   - e.g. `for (auto iter = myVector.cbegin(); iter != myVector.cend(); ++iter)` instead of `iter++`.

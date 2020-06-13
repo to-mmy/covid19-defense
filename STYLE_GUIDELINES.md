@@ -98,7 +98,7 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
   - Therefore, neither absolute nor relative directory names should be used in `#include` directives.
 - Header files and source files shall be kept separately in the [`include`](./include) and [`src`](./src) directories respectively
 - Resource files such as images and sounds shall be placed in the [`resources`](./resources) directory
-- Libraries' header and source files shall be placed in `libs/<libraryName>/include` and `libs/<libraryName>/src` directories
+- Libraries' header and source files shall be placed in [`libs`](./libs)`/<libraryName>/include` and [`libs`](./libs)`/<libraryName>/src` directories
 - Library object files shall be built to [`lib`](./lib)
 - C++ source files shall have extension `.cpp`.
 - C++ header files shall have extension `.h`.

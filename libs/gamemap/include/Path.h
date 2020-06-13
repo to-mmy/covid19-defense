@@ -2,27 +2,26 @@
 #define PATH_H
 
 #include "Cell.h"
-#include "Coordinates.h"
 #include "CellEnum.h"
+#include <SFML/Graphics.hpp>
 
 // Path is a Cell that also has the coordinates of the next Path
-// getCoords and setCoords are defined in parent class Cell.h
 class Path : public Cell {
 private:
     const CellEnum cellType;
-    Coordinates next_path;
+    sf::Vector2u nextPathCoords;
 public:
-    Path(unsigned r, unsigned c, unsigned n_r, unsigned n_c)
-        : Cell(r, c), cellType(CellEnum::PATH), next_path(n_r, n_c) {}
-    Path(Coordinates this_path_coords, Coordinates next_path_coords)
-        : Cell(this_path_coords), cellType(CellEnum::PATH), next_path(next_path_coords) {}
+    Path(unsigned r, unsigned c, unsigned nR, unsigned nC)
+        : Cell(r, c), cellType(CellEnum::PATH), nextPathCoords(nR, nC) {}
+    Path(const sf::Vector2u& thisPathCoords, const sf::Vector2u& nextPathCoords)
+        : Cell(thisPathCoords), cellType(CellEnum::PATH), nextPathCoords(nextPathCoords) {}
 
     // Setters
-    void setNext(unsigned r, unsigned c) { next_path.row = r; next_path.col = c; }
-    void setNext(Coordinates n) { next_path = n; }
+    void setNext(unsigned r, unsigned c) { nextPathCoords = sf::Vector2u(r, c); }
+    void setNext(sf::Vector2u n) { nextPathCoords = n; }
 
     // Getters
-    Coordinates getNextCoords() const { return next_path; }
+    sf::Vector2u getNextCoords() const { return nextPathCoords; }
     virtual CellEnum getCellType() const override { return cellType; }
 };
 

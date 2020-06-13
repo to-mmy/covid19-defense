@@ -1,21 +1,20 @@
-#include "Map.h"
+#include "GameMap.h"
 #include "Cell.h"
 #include "CellEnum.h"
 #include "Path.h"
 #include "Ground.h"
-#include "buildMapFromFile.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <cmath>
 
-sf::Vector2f getCellPositionFromCoordinates(const Coordinates& coords, const float& side_flt);
+sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt);
 sf::Vector2f normalize(const sf::Vector2f& vec);
 
 int main()
 {
-    // sample main for using Map, Cell, Path, Ground, CellEnum, Coordinates
+    // sample main for using Map, Cell, Path, Ground, CellEnum
 
     // First we build a Map with a path as follows
     /*
@@ -63,54 +62,60 @@ int main()
     7,7
     */
 
-    Map* game_map = gamemap::buildMapFromFile(std::string("map.txt"));
+    GameMap gameMap(std::string("map_1_data"));
 
-    // get the 2D Cell* array
-    Cell*** map_cells = game_map->getCells();
-
-    // Make our SFML window
-    const unsigned side_pix = 50; // the length of a side of a cell of the map in pixels
-    const float side_flt = 50.f;
     // Reduce function calls
-    unsigned side_len = game_map->getSideLength();
+    unsigned sideLen = gameMap.getSideLength();
     // The following creates a window just big enough to hold the map, not the menu
-    sf::RenderWindow window(sf::VideoMode(side_len * side_pix, side_len * side_pix), "Example map");
+    sf::RenderWindow window(sf::VideoMode(sideLen * game_map::SIDE_PIX,
+                                          sideLen * game_map::SIDE_PIX),
+                            "Example map");
 
-    // 2D array of RectangleShapes to display cells.
-    sf::RectangleShape** cell_shape_array = new sf::RectangleShape*[side_len];
-    for (unsigned i = 0; i < side_len; ++i) {
-        cell_shape_array[i] = new sf::RectangleShape[side_len];
-    }
-
-    // Set values for these Rectangles
-    for (unsigned i = 0; i < side_len; ++i) {
-        for (unsigned j = 0; j < side_len; ++j) {
-            cell_shape_array[i][j].setSize(sf::Vector2f(side_flt, side_flt));
-            cell_shape_array[i][j].setPosition(static_cast<float>(j) * side_flt, static_cast<float>(i) * side_flt);
-            if (map_cells[i][j]->getCellType() == CellEnum::GROUND) {
-                cell_shape_array[i][j].setFillColor(sf::Color(0, 255, 0));
+    // Enemy sprite texture
+    sf::Texture covidTexture;
+    bool textureLoadSuccess = false;
+    std::string covidTextureFile(game_map::RESOURCE_PATH + "covid_1.png");
+    while (!textureLoadSuccess) {
+        try {
+            if (covidTexture.loadFromFile(covidTextureFile,
+                                          sf::IntRect(0, 0, game_map::SIDE_PIX, game_map::SIDE_PIX)
+                                          )
+                ) {
+                textureLoadSuccess = true;
             }
             else {
-                cell_shape_array[i][j].setFillColor(sf::Color(255, 0, 0));
+                throw 1;
+            }
+        }
+        catch (int e) {
+            switch(e) {
+            case 1:
+                std::cout << "Error opening file " << covidTextureFile << std::endl;
+            default:
+                std::cout << "Enter the full file path for the ground texture file: ";
+                std::getline(std::cin, covidTextureFile);
             }
         }
     }
 
-    // Enemy sprite
-    sf::CircleShape circle(side_flt / 2.f);
-    Coordinates circle_coords = game_map->getStartCoords();
-    circle.setPosition(getCellPositionFromCoordinates(circle_coords, side_flt));
 
-    Path* path_ptr = dynamic_cast<Path*>(map_cells[circle_coords.row][circle_coords.col]);
+    sf::Sprite covid;
+    covid.setTexture(covidTexture);
+    sf::Vector2u covidCoords = gameMap.getStartCoords();
+    covid.setPosition(getCellPositionFromCoordinates(covidCoords, game_map::SIDE_FLT));
 
-    const float circle_speed = 0.05f;
+    Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
 
-    sf::Vector2f circle_direction;
-    sf::Vector2f circle_destination = getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt);
-    sf::Vector2f distance_to_destination(std::abs(circle_destination.x - circle.getPosition().x), std::abs(circle_destination.y - circle.getPosition().y));
+    const float covidSpeed = 0.05f;
 
-    bool draw_circle = true;
-    //circle.setPosition(getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt));
+    sf::Vector2f covidDirection;
+    sf::Vector2f covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
+                                                                   game_map::SIDE_FLT);
+    sf::Vector2f distanceToDestination(std::abs(covidDestination.x - covid.getPosition().x),
+                                       std::abs(covidDestination.y - covid.getPosition().y));
+
+    bool drawCovid = true;
+    //covid.setPosition(getCellPositionFromCoordinates(pathPtr->getNextCoords(), SIDE_FLT));
 
 
     // Render loop
@@ -123,55 +128,46 @@ int main()
                 window.close();
         }
 
-        if (draw_circle) {
-            // Check if the circle has made it to next path
-            distance_to_destination = sf::Vector2f(abs(circle_destination.x - circle.getPosition().x), abs(circle_destination.y - circle.getPosition().y));
-            if (std::abs(distance_to_destination.x) < 1.f && std::abs(distance_to_destination.y) < 1.f) {
-                circle_coords = path_ptr->getNextCoords();
-                path_ptr = dynamic_cast<Path*>(map_cells[circle_coords.row][circle_coords.col]);
-                circle_destination = getCellPositionFromCoordinates(path_ptr->getNextCoords(), side_flt);
-                // Check if circle has made it to the end
-                if (path_ptr->getNextCoords() == game_map->getExitCoords()) {
-                    draw_circle = false;
+        if (drawCovid) {
+            // Check if the covid has made it to next path
+            distanceToDestination = sf::Vector2f(abs(covidDestination.x - covid.getPosition().x),
+                                                 abs(covidDestination.y - covid.getPosition().y)
+                                                 );
+            if (std::abs(distanceToDestination.x) < 1.f
+                && std::abs(distanceToDestination.y) < 1.f) {
+                covidCoords = pathPtr->getNextCoords();
+                pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+                covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
+                                                                  game_map::SIDE_FLT);
+                // Check if covid has made it to the end
+                if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
+                    drawCovid = false;
                 }
             }
 
 
-            // Move the circle
-            circle_direction = normalize(circle_destination - circle.getPosition());
-            circle.move(circle_speed * circle_direction);
+            // Move the covid
+            covidDirection = normalize(covidDestination - covid.getPosition());
+            covid.move(covidSpeed * covidDirection);
         }
 
 
 
         // Draw
         window.clear();
-        for (unsigned i = 0; i < side_len; ++i) {
-            for (unsigned j = 0; j < side_len; ++j) {
-                window.draw(cell_shape_array[i][j]);
-            }
-        }
-        if (draw_circle) {
-            window.draw(circle);
+        gameMap.draw(window);
+        if (drawCovid) {
+            window.draw(covid);
         }
         window.display();
     }
 
-    // Cleanup
-    for (unsigned i = 0; i < side_len; ++i) {
-        delete cell_shape_array[i];
-    }
-    delete [] cell_shape_array;
-    cell_shape_array = nullptr;
-    delete game_map;
-    game_map = nullptr;
-
-
     return 0;
 }
 
-sf::Vector2f getCellPositionFromCoordinates(const Coordinates& coords, const float& side_flt) {
-    return sf::Vector2f(static_cast<float>(coords.col) * side_flt, static_cast<float>(coords.row) * side_flt);
+sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt) {
+    return sf::Vector2f(static_cast<float>(coords.y) * sideFlt,
+                        static_cast<float>(coords.x) * sideFlt);
 }
 
 sf::Vector2f normalize(const sf::Vector2f& vec) {

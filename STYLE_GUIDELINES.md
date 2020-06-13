@@ -96,10 +96,10 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
 ### <a name="fileOrg"></a>File Organization
 - File organization is subject to change.
   - Therefore, neither absolute nor relative directory names should be used in `#include` directives.
-- Header files and source files shall be kept separately in the `/include` and `/src` directories respectively
-- Resource files such as images and sounds shall be placed in the `/resources` directory
-- Libraries' header and source files shall be placed in `/libs/<libraryName>/include` and `/libs/<libraryName>/src` directories
-- Library object files shall be built to `/lib`
+- Header files and source files shall be kept separately in the [`include`](./include) and [`src`](./src) directories respectively
+- Resource files such as images and sounds shall be placed in the [`resources`](./resources) directory
+- Libraries' header and source files shall be placed in `libs/<libraryName>/include` and `libs/<libraryName>/src` directories
+- Library object files shall be built to [`lib`](./lib)
 - C++ source files shall have extension `.cpp`.
 - C++ header files shall have extension `.h`.
 - Only one externally visible class per header file.
@@ -154,4 +154,5 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
 - Use prefix increment/decrement instead of postfix increment/decrement when the value of the variable is not used.
   - For class objects, the postfix operation has to keep a temporary return value of the object before changing the object. It is a good habit to get into to use prefix increment/decrement at all times.
   - e.g. `for (auto iter = myVector.cbegin(); iter != myVector.cend(); ++iter)` instead of `iter++`.
+
 [to top](#top)

@@ -106,6 +106,7 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
 - Only one externally visible function per header file.
 - Class and function declarations and implementations should be split into header and source files respectively.
   - The header and source files should have the same name, differing only by file extension.
+  - Exception: function implementations may be put in the header file if they are one line.
 
 [to top](#top)
 

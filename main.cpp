@@ -1,180 +1,236 @@
-#include "GameMap.h"
-#include "Cell.h"
-#include "CellEnum.h"
-#include "Path.h"
-#include "Ground.h"
+// make menu class with 3 buttons
+
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
 #include <string>
-#include <cmath>
+#include <cctype>
+#include <sstream>
+using namespace std;
 
-sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt);
-sf::Vector2f normalize(const sf::Vector2f& vec);
+// header files
+#include "Gamev2.h"
 
-int main()
+// add resouce path
+string ResourcePath = "/Users/fkk/Desktop/resources/";
+
+
+const int  NUM_OF_MENU_CHOICES = 3;
+
+//////////////menu class /////////////
+class Menu
 {
-    // sample main for using Map, Cell, Path, Ground, CellEnum
 
-    // First we build a Map with a path as follows
-    /*
-     01234567
-    0oooooooo
-    1xxoxxxoo
-    2oxoxoxxo
-    3oxoxxoxx
-    4oxxoxxox
-    5ooxooxox
-    6ooxxxxox
-    7ooooooox
-    */
-    // text file for the above looks like this (each pair is row,col):
-    /*
-    8 size
-    28 path length
-    1,0
-    1,1
-    2,1
-    3,1
-    4,1
-    4,2
-    5,2
-    6,2
-    6,3
-    6,4
-    6,5
-    5,5
-    4,5
-    4,4
-    3,4
-    3,3
-    2,3
-    1,3
-    1,4
-    1,5
-    2,5
-    2,6
-    3,6
-    3,7
-    4,7
-    5,7
-    6,7
-    7,7
-    */
+private:
+    int selectedItemIndex;
+    sf::Font font;
+    sf::Text menu[NUM_OF_MENU_CHOICES];
 
-    GameMap gameMap(std::string("map_1_data"));
+public:
+    Menu(float width, float height);
+    ~Menu();
 
-    // Reduce function calls
-    unsigned sideLen = gameMap.getSideLength();
-    // The following creates a window just big enough to hold the map, not the menu
-    sf::RenderWindow window(sf::VideoMode(sideLen * game_map::SIDE_PIX,
-                                          sideLen * game_map::SIDE_PIX),
-                            "Example map");
+    void draw(sf::RenderWindow &window);
+    void MoveUp();
+    void MoveDown();
+    int GetPressedItem() { return selectedItemIndex; }
+    void displayWelcome(sf::RenderWindow& window);
+};
 
-    // Enemy sprite texture
-    sf::Texture covidTexture;
-    bool textureLoadSuccess = false;
-    std::string covidTextureFile(game_map::RESOURCE_PATH + "covid_1.png");
-    while (!textureLoadSuccess) {
-        try {
-            if (covidTexture.loadFromFile(covidTextureFile,
-                                          sf::IntRect(0, 0, game_map::SIDE_PIX, game_map::SIDE_PIX)
-                                          )
-                ) {
-                textureLoadSuccess = true;
-            }
-            else {
-                throw 1;
-            }
-        }
-        catch (int e) {
-            switch(e) {
-            case 1:
-                std::cout << "Error opening file " << covidTextureFile << std::endl;
-            default:
-                std::cout << "Enter the full file path for the ground texture file: ";
-                std::getline(std::cin, covidTextureFile);
-            }
-        }
+Menu::Menu(float width, float height){
+    // load music
+
+
+
+
+    // font
+    if (!font.loadFromFile(ResourcePath + "MYBLS___.TTF")){
+        std::cout << "Can't find font" << std::endl;
     }
 
+    menu[0].setFont(font);
+    menu[0].setFillColor(sf::Color::Red);
+    menu[0].setString("Play");
+    menu[0].setStyle(sf::Text::Bold);
+    menu[0].setPosition(sf::Vector2f(width / 10, 100 + height / (NUM_OF_MENU_CHOICES + 10) * 1));
 
-    sf::Sprite covid;
-    covid.setTexture(covidTexture);
-    sf::Vector2u covidCoords = gameMap.getStartCoords();
-    covid.setPosition(getCellPositionFromCoordinates(covidCoords, game_map::SIDE_FLT));
+    menu[1].setFont(font);
+    menu[1].setFillColor(sf::Color::Black);
+    menu[1].setString("Options");
+    menu[1].setStyle(sf::Text::Bold);
+    menu[1].setPosition(sf::Vector2f(width / 10, 100+ height / (NUM_OF_MENU_CHOICES + 10) * 2));
 
-    Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+    menu[2].setFont(font);
+    menu[2].setFillColor(sf::Color::Black);
+    menu[2].setString("Exit");
+    menu[2].setStyle(sf::Text::Bold);
+    menu[2].setPosition(sf::Vector2f(width / 10, 100 + height / (NUM_OF_MENU_CHOICES + 10) * 3));
 
-    const float covidSpeed = 0.05f;
-
-    sf::Vector2f covidDirection;
-    sf::Vector2f covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
-                                                                   game_map::SIDE_FLT);
-    sf::Vector2f distanceToDestination(std::abs(covidDestination.x - covid.getPosition().x),
-                                       std::abs(covidDestination.y - covid.getPosition().y));
-
-    bool drawCovid = true;
-    //covid.setPosition(getCellPositionFromCoordinates(pathPtr->getNextCoords(), SIDE_FLT));
+    selectedItemIndex = 0;
+}
 
 
-    // Render loop
+Menu::~Menu(){
+}
+
+void Menu::draw(sf::RenderWindow &window){
+    for (int i = 0; i < NUM_OF_MENU_CHOICES; i++){
+        window.draw(menu[i]);
+    }
+}
+
+void Menu::MoveUp(){
+    if (selectedItemIndex - 1 >= 0){
+        menu[selectedItemIndex].setFillColor(sf::Color::Black);
+        selectedItemIndex--;
+        menu[selectedItemIndex].setFillColor(sf::Color::Red);
+    }
+}
+
+void Menu::MoveDown(){
+    if (selectedItemIndex + 1 < NUM_OF_MENU_CHOICES){
+        menu[selectedItemIndex].setFillColor(sf::Color::Black);
+        selectedItemIndex++;
+        menu[selectedItemIndex].setFillColor(sf::Color::Red);
+    }
+}
+
+void Menu::displayWelcome(sf::RenderWindow &window) {
+    string textFromFile, buffer;
+    ifstream fin (ResourcePath + "welcome.txt");
+    if (!fin)
+    {
+        std::cout << "Cannot open welcome file." << std::endl;
+        return;
+    }
+    while (getline(fin,buffer))
+        textFromFile += buffer += '\n';
+
+    fin.close();
+
+    // Text
+    sf::Font font;
+    if (!font.loadFromFile(ResourcePath + "Jingle Bells.ttf"))
+    {
+        std::cout << "Can't find font" << std::endl;
+    }
+    sf::Text text;
+    text.setFont(font);
+    text.setString(textFromFile.c_str());
+    text.setCharacterSize(28);
+    text.setFillColor(sf::Color::White);
+    text.setStyle(sf::Text::Bold);
+    text.setPosition(50.0f,50.0f);
+
+    sf::Event event;
     while (window.isOpen())
     {
-        sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        if (drawCovid) {
-            // Check if the covid has made it to next path
-            distanceToDestination = sf::Vector2f(abs(covidDestination.x - covid.getPosition().x),
-                                                 abs(covidDestination.y - covid.getPosition().y)
-                                                 );
-            if (std::abs(distanceToDestination.x) < 1.f
-                && std::abs(distanceToDestination.y) < 1.f) {
-                covidCoords = pathPtr->getNextCoords();
-                pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
-                covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
-                                                                  game_map::SIDE_FLT);
-                // Check if covid has made it to the end
-                if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
-                    drawCovid = false;
-                }
+            switch (event.type)
+            {
+                case sf::Event::Closed:
+                    window.close();
+                    break;
+                case sf::Event::KeyPressed:
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+                    {
+                        window.clear();
+                        return;
+                    }
+                default:
+                    break;
             }
-
-
-            // Move the covid
-            covidDirection = normalize(covidDestination - covid.getPosition());
-            covid.move(covidSpeed * covidDirection);
         }
-
-
-
-        // Draw
         window.clear();
-        gameMap.draw(window);
-        if (drawCovid) {
-            window.draw(covid);
-        }
+        window.draw(text);
         window.display();
     }
 
+}
+
+
+
+///////// main /////////////
+int main(){
+    sf::RenderWindow window(sf::VideoMode(800, 600), "*****TEST VERSION ****");
+
+    // background
+    sf::Vector2f BackgroundSize;
+    sf::RectangleShape background(sf::Vector2f(window.getSize().x, window.getSize().y));
+    sf::Texture backgroundTexture;
+    BackgroundSize = background.getSize();
+    backgroundTexture.loadFromFile(ResourcePath + "background3.jpg");
+    background.setTexture(&backgroundTexture);
+
+
+    // menu
+    Menu menu(window.getSize().x, window.getSize().y);
+
+    while (window.isOpen()){
+        sf::Event event;
+
+        while (window.pollEvent(event)){
+                if(event.type == sf::Event::Closed){
+                    window.close();
+                }
+                if (event.type == sf::Event::KeyPressed){
+                    // key gets pressed
+                    switch (event.key.code) {
+                        case sf::Keyboard::Up:
+                            menu.MoveUp();
+                            break;
+
+                        case sf::Keyboard::Down:
+                            menu.MoveDown();
+                            break;
+
+                        case sf::Keyboard::Return:
+                            switch (menu.GetPressedItem()) {
+                                case 0:
+                                    //for test
+                                    std::cout << "Play button has been pressed" << std::endl;
+
+                                    // display the introduction
+                                    menu.displayWelcome(window);
+
+                                    // start  game
+                                    //
+
+
+
+                                    break;
+                                case 1:
+                                    // for test
+                                    std::cout << "Option button has been pressed" << std::endl;
+
+                                    // others....  highScores list
+
+
+
+                                    break;
+                                case 2:
+                                    window.close();
+                                    break;
+                            }
+                        default:
+                            break;
+                    }
+                }
+        }
+
+        window.clear();
+        window.draw(background);
+        menu.draw(window);
+        window.display();
+    }
     return 0;
 }
 
-sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt) {
-    return sf::Vector2f(static_cast<float>(coords.y) * sideFlt,
-                        static_cast<float>(coords.x) * sideFlt);
-}
 
-sf::Vector2f normalize(const sf::Vector2f& vec) {
-    float magnitude = sqrt((vec.x * vec.x) + (vec.y * vec.y));
-    if (magnitude == 0.f) {
-        return vec;
-    }
-    return sf::Vector2f(vec.x / magnitude, vec.y / magnitude);
 
-}
+

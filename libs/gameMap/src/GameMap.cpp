@@ -5,8 +5,10 @@
 #include <fstream>
 
 namespace game_map {
-const unsigned SIDE_PIX = 50;
+const unsigned SIDE_PIX = 96;
 const float SIDE_FLT = static_cast<float>(SIDE_PIX);
+const sf::Vector2f SPRITE_SCALE(SIDE_FLT / 50.f, SIDE_FLT / 50.f); // 50 is size of
+                                                                        // texture file
 const std::string RESOURCE_PATH = "resources\\";
 }
 
@@ -191,6 +193,7 @@ GameMap::GameMap(const std::string& mapFileName, const sf::Vector2f& drOrigin) :
             cells[i][j]->setSpriteTexture(groundTexture);
             tempPos = drawOrigin + cells[i][j]->getPosition();
             cells[i][j]->setSpritePosition(tempPos);
+            cells[i][j]->setSpriteScale(game_map::SPRITE_SCALE);
         }
     }
 
@@ -231,6 +234,7 @@ GameMap::GameMap(const std::string& mapFileName, const sf::Vector2f& drOrigin) :
         cells[pathCoords.x][pathCoords.y]->setSpriteTexture(pathTexture);
         tempPos = drawOrigin + cells[pathCoords.x][pathCoords.y]->getPosition();
         cells[pathCoords.x][pathCoords.y]->setSpritePosition(tempPos);
+        cells[pathCoords.x][pathCoords.y]->setSpriteScale(game_map::SPRITE_SCALE);
         pathCoords = nextPathCoords;
     }
     // The last Path cell is set outside the loop because we set its next to exitCoords
@@ -241,6 +245,7 @@ GameMap::GameMap(const std::string& mapFileName, const sf::Vector2f& drOrigin) :
     cells[pathCoords.x][pathCoords.y]->setSpriteTexture(pathTexture);
     tempPos = drawOrigin + cells[pathCoords.x][pathCoords.y]->getPosition();
     cells[pathCoords.x][pathCoords.y]->setSpritePosition(tempPos);
+    cells[pathCoords.x][pathCoords.y]->setSpriteScale(game_map::SPRITE_SCALE);
 
     // Text output (gcc -DDEBUG)
     #ifdef DEBUG

@@ -9,7 +9,6 @@
 #include <string>
 #include <cmath>
 
-sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt);
 sf::Vector2f normalize(const sf::Vector2f& vec);
 
 int main()
@@ -62,7 +61,9 @@ int main()
     7,7
     */
 
-    GameMap gameMap(std::string("map_1_data"));
+    const sf::Vector2f GAME_MAP_ORIGIN = sf::Vector2f(0.f, 0.f);
+
+    GameMap gameMap(std::string("map_1_data"), GAME_MAP_ORIGIN);
 
     // Reduce function calls
     unsigned sideLen = gameMap.getSideLength();
@@ -102,15 +103,16 @@ int main()
     sf::Sprite covid;
     covid.setTexture(covidTexture);
     sf::Vector2u covidCoords = gameMap.getStartCoords();
-    covid.setPosition(getCellPositionFromCoordinates(covidCoords, game_map::SIDE_FLT));
 
     Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+    covid.setPosition(GAME_MAP_ORIGIN + pathPtr->getPosition());
 
-    const float covidSpeed = 0.05f;
+    covid.setScale(game_map::SPRITE_SCALE);
+
+    const float COVID_SPEED = 0.05f;
 
     sf::Vector2f covidDirection;
-    sf::Vector2f covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
-                                                                   game_map::SIDE_FLT);
+    sf::Vector2f covidDestination = GAME_MAP_ORIGIN + pathPtr->getNextPosition();
     sf::Vector2f distanceToDestination(std::abs(covidDestination.x - covid.getPosition().x),
                                        std::abs(covidDestination.y - covid.getPosition().y));
 
@@ -137,8 +139,7 @@ int main()
                 && std::abs(distanceToDestination.y) < 1.f) {
                 covidCoords = pathPtr->getNextCoords();
                 pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
-                covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
-                                                                  game_map::SIDE_FLT);
+                covidDestination = GAME_MAP_ORIGIN + pathPtr->getNextPosition();
                 // Check if covid has made it to the end
                 if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
                     drawCovid = false;
@@ -148,7 +149,7 @@ int main()
 
             // Move the covid
             covidDirection = normalize(covidDestination - covid.getPosition());
-            covid.move(covidSpeed * covidDirection);
+            covid.move(COVID_SPEED * covidDirection);
         }
 
 
@@ -163,11 +164,6 @@ int main()
     }
 
     return 0;
-}
-
-sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt) {
-    return sf::Vector2f(static_cast<float>(coords.y) * sideFlt,
-                        static_cast<float>(coords.x) * sideFlt);
 }
 
 sf::Vector2f normalize(const sf::Vector2f& vec) {

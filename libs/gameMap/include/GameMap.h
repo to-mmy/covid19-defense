@@ -2,6 +2,7 @@
 #define GAMEMAP_H
 
 #include "Cell.h"
+#include "coordsToPosition.h"
 #include <SFML/Graphics.hpp>
 #include <string>
 
@@ -9,6 +10,7 @@
 namespace game_map {
 extern const unsigned SIDE_PIX;
 extern const float SIDE_FLT;
+extern const sf::Vector2f SPRITE_SCALE;
 extern const std::string RESOURCE_PATH;
 }
 
@@ -42,6 +44,7 @@ public:
     unsigned getSideLength() const { return sideLength; }
     sf::Vector2u getStartCoords() const { return startCoords; }
     sf::Vector2u getExitCoords() const { return exitCoords; }
+    sf::Vector2f getDrawOrigin() const { return drawOrigin; }
 
     // Draw to a RenderWindow.
     void draw(sf::RenderWindow& window) const;

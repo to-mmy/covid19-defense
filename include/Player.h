@@ -1,5 +1,7 @@
-#pragma once
-#include <SFML\Graphics.hpp>
+#ifndef PLAYER_H
+#define PLAYER_H
+
+#include <SFML/Graphics.hpp>
 #include <iostream>
 
 class Player
@@ -112,3 +114,4 @@ void Player::setTextureRect()
 //8-Bit Bounce     SomeGuy22 (For SOAP)
 //Fire.aif       Gemmellness (FOR EITHER)
 
+#endif // PLAYER_H

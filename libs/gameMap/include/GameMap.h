@@ -45,6 +45,7 @@ public:
     sf::Vector2u getStartCoords() const { return startCoords; }
     sf::Vector2u getExitCoords() const { return exitCoords; }
     sf::Vector2f getDrawOrigin() const { return drawOrigin; }
+    sf::FloatRect getGlobalBounds() const;
 
     // Draw to a RenderWindow.
     void draw(sf::RenderWindow& window) const;

@@ -128,12 +128,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+<<<<<<< HEAD
+=======
+    <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="GameMap.cpp" />
+>>>>>>> tower-v2
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Bullet.h" />
+<<<<<<< HEAD
     <ClInclude Include="Enemy.h" />
+=======
+    <ClInclude Include="Cell.h" />
+    <ClInclude Include="CellEnum.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="GameMap.h" />
+    <ClInclude Include="Ground.h" />
+    <ClInclude Include="Path.h" />
+>>>>>>> tower-v2
     <ClInclude Include="Tower.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

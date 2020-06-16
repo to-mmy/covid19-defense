@@ -12,7 +12,11 @@ private:
 	double enemyX;
 	double enemyY;
 public:
+<<<<<<< HEAD
 	Bullet(sf::Vector2f size, double towerX, double towerY, double enemyX, double enemyY);
+=======
+	Bullet(sf::Vector2f size, double towerXCoordinate, double towerYCoordinate, double enemyXCoordinate, double enemyYCoordinate);
+>>>>>>> tower-v2
 	void setPos(sf::Vector2f);
 	void fire();
 	int getRight();

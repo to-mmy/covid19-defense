@@ -5,7 +5,7 @@
 #include <fstream>
 
 namespace game_map {
-const unsigned SIDE_PIX = 96;
+const unsigned SIDE_PIX = 90;
 const float SIDE_FLT = static_cast<float>(SIDE_PIX);
 const sf::Vector2f SPRITE_SCALE(SIDE_FLT / 50.f, SIDE_FLT / 50.f); // 50 is size of
                                                                         // texture file

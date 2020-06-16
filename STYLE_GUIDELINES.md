@@ -150,6 +150,20 @@ void aReallyReallyLongFunctionName(int reallyLongParameterOne, int reallyLongPar
 - Avoid macros.
   - Replace with constants, enumerations, inline functions, or lambdas.
 - If a value is to be used more than once, use a constant instead of literals.
+- If your code refers to a file name, e.g. for file I/O, make one namespace-wrapped global constant string to define the directory path, and then for each time you refer to the file name, append the file name to the path constant
+  - Example:
+```
+namespace file_IO_constants {
+const std::string FILE_PATH = "resources\\";
+}
+
+int main {
+    std::string fileName = file_IO_constants::FILE_PATH + "myResource.png";
+    openFile(fileName);
+    closeFile(fileName);
+    return 0;
+}
+```
 - Use C++ style casting not C style casting.
 - Use prefix increment/decrement instead of postfix increment/decrement when the value of the variable is not used.
   - For class objects, the postfix operation has to keep a temporary return value of the object before changing the object. It is a good habit to get into to use prefix increment/decrement at all times.

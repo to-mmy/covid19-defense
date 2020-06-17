@@ -1,0 +1,10 @@
+						COVID-19 Defense Game
+
+CoronaVirus Defense is a game where you try to stop the virus 
+from reaching inside of body. If they manage to cross the level,
+you lose a valuable health point. You stop virus by buying 
+unique equipments with money and place them in their corresponding 
+tile. The player gets money from killing enemies and completing 
+waves of virus.
+
+						PRESS SPACE TO START GAME

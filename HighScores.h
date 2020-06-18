@@ -1,151 +1,121 @@
-#ifndef HIGH_SCORES_H
-#define HIGH_SCORES_H
+//
+// Created by Kuo Fu.
+//
 
-#include <string>
-#include <set>
-#include <iomanip>
-#include <cstring>
-#include <fstream>
+#ifndef FINALPROJECT_HIGH_SCORES_H
+#define FINALPROJECT_HIGH_SCORES_H
+
 #include <iostream>
+#include <fstream>
 #include <iomanip>
+#include "playerScore.h"
 
-class Score
-{
-    char name[16];
-    int score;
-public:
-    Score(const char* n = "no name", int sc = 0);
-
-    char* getName();
-    int getScore();
-    void setName(const char*);
-    void setScore(int);
-
-    bool operator<(const Score& obj) const;
-    friend std::ostream& operator<<(std::ostream& out, const Score& obj);
-};
-
-Score::Score(const char* n, int sc) : score(sc)
-{
-#ifdef _MSC_VER                         // for MSVS 2017
-    strcpy_s(name, sizeof name, n);
-#else
-    std::strcpy(name,n);
-#endif
-}
-
-char* Score::getName() {
-    return name;
-}
-
-void Score::setName(const char* input) {
-#ifdef _MSC_VER                         // for MSVS 2017
-    strcpy_s(name, sizeof name, n);
-#else
-    std::strcpy(name,input);
-#endif
-}
-
-int Score::getScore() {
-    return score;
-}
-
-void Score::setScore(int input) {
-    score = input;
-}
-
-bool Score::operator<(const Score& obj) const
-{
-    return score > obj.score;  // display in reverse order
-}
-
-std::ostream& operator<<(std::ostream& out, const Score& obj)
-{
-    out << std::left << std::setw(16) << obj.name
-        << std::right << std::setw(4) << obj.score
-        << std::endl;
-    return out;
-}
-
-class HighScores
-{
-public:
-    HighScores();
-    void WriteHighScoresFile();
-    void updateHighScores(const Score&);
-protected:
-
+class HighScoreList{
 private:
-    std::multiset<Score> highScores;
-    bool highScoresFileExists;
-    static std::string HighScoresFilename;
-    friend std::ostream& operator<<(std::ostream& out, const HighScores& scores);
+    struct ListNode{
+        PlayerData pData;
+        ListNode *next;
+        ListNode *back;
+    };
+    ListNode *head;
+    int count;
+    string outFilename;
 
+public:
+    //Constructor
+    HighScoreList();
+
+    // Linked list operations
+    void insertNode(PlayerData);
+    int getCount() {return count;}
+    bool isEmpty();
+    void update();
+    void writeToFile(string outFilename);
+
+    //Destructor
+    ~HighScoreList();
 };
-std::string HighScores::HighScoresFilename = "highscores.bin";
-
-HighScores::HighScores()
-        : highScores(), highScoresFileExists(true)
+HighScoreList::HighScoreList()
 {
-    std::ifstream fin(HighScoresFilename,std::ios_base::binary);
-    if (!fin)
-    {
-        std::cout << "Can't find high scores file, " << HighScoresFilename << ".  I'll create a new one." << std::endl;
-        highScoresFileExists = false;
-    }
-    else
-    {
-        Score temp;
-        while (fin.read(reinterpret_cast<char*>(&temp),sizeof(temp)))
-        {
-            highScores.insert(temp);
-        }
-        fin.close();
-    }
-}
-
-void HighScores::updateHighScores(const Score& obj)
-{
-    highScores.insert(obj);
-    if (highScores.size() > 10)
-    {
-        highScores.erase(--highScores.end());
-    }
+    head = new ListNode; // head points to the sentinel node
+    head->next = head;
+    head->back = head;
+    count = 0;
 }
 
 
-void HighScores::WriteHighScoresFile()
+void HighScoreList::insertNode(PlayerData dataIn)
 {
-    std::ofstream fout(HighScoresFilename,std::ios_base::binary);
 
-    auto count = 0;
-    for (auto it = highScores.cbegin(); it != highScores.cend(); ++it, ++count )
+    ListNode *newNode;  // A new node
+    ListNode *pCur;     // To traverse the list
+    ListNode *pPre;     // The previous node
+
+    newNode = new ListNode;
+    newNode -> pData = dataIn;
+    pPre = head;
+    pCur = head->next;
+
+    while(pCur != head && pCur->pData < dataIn)
     {
-        if (count == 10)
-            break;
-        fout.write(reinterpret_cast<const char*>(&*it),sizeof(*it));
+        pPre = pCur;
+        pCur = pCur->next;
     }
-    fout.close();
-    std::cout << "High scores file written...." << std::endl;
+
+    newNode->next = pCur;
+    newNode->back = pPre;
+    pCur->back = newNode;
+    pPre->next = newNode;
+
+    count++;
 }
 
-std::ostream& operator<<(std::ostream& out, const HighScores& scores)
-{
-    if (scores.highScores.size() == 0)
-        out << "No high scores recorded" << std::endl;
-    else
-    {
-        out << "***************** High Scores ******************" << std::endl << std::endl;
-        out << "     Name           Score         " << std::endl;
-        auto count = 1;
-        for (auto it = scores.highScores.cbegin(); it != scores.highScores.cend(); ++it, ++count )
-        {
-            if (count == 11)
-                break;
-            out << std::setw(3) << count << "  " << *it;
-        }
+bool HighScoreList::isEmpty(){
+    return (head->next == head && head->back == head);
+}
+void HighScoreList::update() {
+    ListNode *pCur;
+    ListNode *pLast;
+
+    if (count > 10){
+        // delete the last node
+        //////////
     }
-    return out;
 }
 
-#endif // HIGH_SCORES_H
+HighScoreList::~HighScoreList()
+{
+    ListNode *pCur;   // To traverse the list
+    ListNode *pNext;  // To point to the next node
+
+    pCur = head->next;
+
+    while (pCur != head)
+    {
+        pNext = pCur -> next;
+        pCur->next->back = pNext;
+        delete pCur;
+
+        pCur = pNext;
+    }
+    delete head; // delete the sentinel node
+}
+void HighScoreList::writeToFile(string outFilename) {
+    ofstream outputFile;
+    outputFile.open(outFilename);
+
+    if(outputFile.fail()){
+        cout << "ERROR: Cannot open/create outputFile.\n";
+        exit(EXIT_FAILURE);
+    }
+
+    // traverseForward
+    ListNode *pWalk;
+    pWalk = head->next;
+    while(pWalk != head){
+        outputFile << pWalk->pData << endl;
+        pWalk = pWalk->next;
+    }
+    outputFile.close();
+}
+#endif //FINALPROJECT_HIGH_SCORES_H

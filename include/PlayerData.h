@@ -32,6 +32,14 @@ public:
     void setName(const std::string& n) { name = n; }
     void setDrawOrigin(const sf::Vector2f& d) { drawOrigin = d; }
 
+    // Add or subtract quickly
+    void addMoney(int m) { money += m; }
+    void loseMoney(int m) { money = (m > money ? 0 : money - m); }
+    void addScore(int s) { score += s; }
+    void loseScore(int s) { score = (s > score ? 0 : score - s); }
+    void addLives(int l) { lives += l; }
+    void loseLives(int l) { lives = (l > lives ? 0 : lives - l); }
+
     // Getters
     int getMoney() const { return money; }
     int getScore() const { return score; }

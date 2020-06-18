@@ -8,7 +8,7 @@
 #include "Tower.h"
 #include "Bullet.h"
 #include "PlaceTower.h"
-#include "MouseDown.h"
+#include "ButtonDown.h"
 #include "PlayerData.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -22,11 +22,39 @@
 namespace draw {
 const sf::Vector2f GAME_MAP_ORIGIN = sf::Vector2f(0.f, 0.f);
 const float SPACER = 10.f;
+const int WINDOW_WIDTH = 1080;
+const int WINDOW_HEIGHT = 720;
 }
 
 namespace prices {
 const int SANITIZER_PRICE = 400;
 const int SOAP_PRICE = 150;
+}
+
+namespace messages {
+const std::string ROUND_MESSAGES[5] {
+        "Welcome to the COVID-19 Defense Force!\n"
+        "Click on a tower in the right-hand column\n"
+        "to select it, and click again on a city block\n"
+        "to spend money to place your tower.\n"
+        "Right-click to cancel placing your tower.\n"
+        "Keep an eye on your lives - if you run out,\n"
+        "it's game over! Click the play button or\n"
+        "press the space key when you're ready\n"
+        "to begin.",
+        "Congratulations, you've beaten the first wave!\n"
+        "Did you know you can build towers while the\n"
+        "game is paused? Prepare yourself for the\n"
+        "second wave, and click the play button when\n"
+        "you're ready to begin.",
+        "Second wave complete! Almost halfway there,\n"
+        "you can do it! Get ready for the third wave,\n"
+        "and click play to begin.",
+        "Third wave down! You're more than halfway\n"
+        "there, keep it up!",
+        "One more wave to go. Just one more and\n"
+        "you're free. Don't stop now!"
+    };
 }
 
 sf::Vector2f normalize(const sf::Vector2f& vec);
@@ -75,12 +103,13 @@ int main() {
 
     //opening a window
     sf::RenderWindow window;
-    sf::Vector2i centerWindow((sf::VideoMode::getDesktopMode().width / 2) - 540,
-                              (sf::VideoMode::getDesktopMode().height / 2) - 360);
-    window.create(sf::VideoMode(1080, 720), "Tower Defense Game",
+    sf::Vector2i centerWindow((sf::VideoMode::getDesktopMode().width / 2)
+                                  - (draw::WINDOW_WIDTH / 2),
+                              (sf::VideoMode::getDesktopMode().height / 2)
+                                  - (draw::WINDOW_HEIGHT / 2));
+    window.create(sf::VideoMode(draw::WINDOW_WIDTH, draw::WINDOW_HEIGHT), "COVID-19 Defense",
                   sf::Style::Titlebar | sf::Style::Close);
     window.setPosition(centerWindow);
-    window.setKeyRepeatEnabled(true);
 
     //Defining objects
     //Tower tower(sf::Vector2f(150, 150), sf::Vector2f(0, 0), "soap");
@@ -170,6 +199,18 @@ int main() {
     sanitizerDescription.setFillColor(sf::Color::White);
     bool drawSanitizerDescription = false;
 
+    // Game messages to the player
+
+
+    sf::Text messageText;
+    messageText.setFont(descriptionFont);
+    messageText.setPosition(sanitizerSelection.getPosition()
+                            + sf::Vector2f(0.f, game_map::SIDE_FLT + draw::SPACER));
+    messageText.setCharacterSize(game_map::SIDE_PIX / 4);
+    messageText.setString(messages::ROUND_MESSAGES[0]);
+    messageText.setFillColor(sf::Color::White);
+    bool drawMessageText = true;
+
     // A temporary tower to show placement
     Tower* towerIndicatorPtr = nullptr;
 
@@ -186,6 +227,21 @@ int main() {
     sf::Sound squirtSound;
     squirtSound.setBuffer(squirtBuffer);
 
+    sf::SoundBuffer mouseClickBuffer;
+    loadSound(mouseClickBuffer, std::string(game_map::RESOURCE_PATH + "mouse_click.wav"));
+    sf::Sound mouseClickSound;
+    mouseClickSound.setBuffer(mouseClickBuffer);
+
+    sf::SoundBuffer wrongClickBuffer;
+    loadSound(wrongClickBuffer, std::string(game_map::RESOURCE_PATH + "wrong.wav"));
+    sf::Sound wrongClickSound;
+    wrongClickSound.setBuffer(wrongClickBuffer);
+
+    sf::SoundBuffer cashRegisterBuffer;
+    loadSound(cashRegisterBuffer, std::string(game_map::RESOURCE_PATH + "cash_register.wav"));
+    sf::Sound cashRegisterSound;
+    cashRegisterSound.setBuffer(cashRegisterBuffer);
+
     //animation
     Animation soapAnimation(&soapTexture, sf::Vector2u(3, 1), 0.3f);
     Animation sanitizerAnimation(&sanitizerTexture, sf::Vector2u(3, 1), 0.3f);
@@ -199,8 +255,12 @@ int main() {
     sf::Vector2f mouseFloat(mousePos);
 
     // delay timer for mouse click
-    sf::Clock clickClock;
+    sf::Clock spaceKeyClock;
+    sf::Clock leftMouseClock;
+    sf::Clock rightMouseClock;
     sf::Clock playPauseClock;
+    sf::Clock soapSelectionClock;
+    sf::Clock sanitizerSelectionClock;
     const float CLICK_DELAY = 0.2f; // delay in seconds -> 0.2 seconds (100 ms == instant to humans)
 
     // What kind of tower, if any, to place
@@ -209,12 +269,15 @@ int main() {
 
 
     sf::Event event;
-    MouseDown leftMouseDown = MouseDown::RELEASE;
-    MouseDown rightMouseDown = MouseDown::RELEASE;
+    ButtonDown spaceKeyDown = ButtonDown::RELEASE;
+    bool spaceKeyPressable = false;
+    ButtonDown leftMouseDown = ButtonDown::RELEASE;
+    bool leftMousePressable = false;
+    ButtonDown rightMouseDown = ButtonDown::RELEASE;
+    bool rightMousePressable = false;
 
     //main loop
     while (window.isOpen()) {
-        //tower.getRect().setTexture(&soapTexture);
 
         //animationDeltaTime used to make animation consistent for different OS's
         animationDeltaTime = animationClock.restart().asSeconds();
@@ -225,100 +288,135 @@ int main() {
             case sf::Event::Closed:
                 window.close();
                 break;
+            case sf::Event::LostFocus:
+                paused = true;
+                break;
+
+            case sf::Event::KeyPressed:
+                if (event.key.code == sf::Keyboard::Space) {
+                    spaceKeyClock.restart();
+                    spaceKeyDown = ButtonDown::PRESS;
+                }
+                break;
+            case sf::Event::KeyReleased:
+                if (event.key.code == sf::Keyboard::Space) {
+                    spaceKeyDown = ButtonDown::RELEASE;
+                }
+                break;
+
             case sf::Event::MouseMoved:
                 mousePos = sf::Mouse::getPosition(window);
                 break;
             case sf::Event::MouseButtonPressed:
-                // left click
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    clickClock.restart();
-                    leftMouseDown = MouseDown::PRESS;
+                    leftMouseClock.restart();
+                    leftMouseDown = ButtonDown::PRESS;
                 }
-                // right click -> cancel placement
-                else if (event.mouseButton.button == sf::Mouse::Right
-                         && rightMouseDown == MouseDown::RELEASE) {
-                    placeWhat = PlaceTower::NONE;
-                    rightMouseDown = MouseDown::PRESS;
+                else if (event.mouseButton.button == sf::Mouse::Right) {
+                    rightMouseClock.restart();
+                    rightMouseDown = ButtonDown::PRESS;
                 }
                 mousePos = sf::Mouse::getPosition(window);
                 break;
             case sf::Event::MouseButtonReleased:
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    leftMouseDown = MouseDown::RELEASE;
+                    leftMouseDown = ButtonDown::RELEASE;
                 }
                 else if (event.mouseButton.button == sf::Mouse::Right) {
-                    rightMouseDown = MouseDown::RELEASE;
+                    rightMouseDown = ButtonDown::RELEASE;
                 }
+
             default:
                 mousePos = sf::Mouse::getPosition(window);
-                if (leftMouseDown == MouseDown::PRESS) {
-                    leftMouseDown = MouseDown::HOLD;
+                if (leftMouseDown == ButtonDown::PRESS) {
+                    leftMouseDown = ButtonDown::HOLD;
+                }
+                if (rightMouseDown == ButtonDown::PRESS) {
+                    rightMouseDown = ButtonDown::HOLD;
                 }
             }
 
         }
 
+        // Updating based on inputs
         mouseFloat = sf::Vector2f(mousePos);
-        if (clickClock.getElapsedTime().asSeconds() > CLICK_DELAY && leftMouseDown == MouseDown::RELEASE) {
-            // For each button, highlight it if it is clickable (mouse within borders)
-            clickClock.restart();
-            if (playPauseRect.contains(mouseFloat)) {
-                playPauseButton.setFillColor(sf::Color::Yellow);
-                playPauseClickable = true;
-                soapSelection.setFillColor(sf::Color::White);
-                soapSelectionClickable = false;
-                drawSoapDescription = false;
-                sanitizerSelection.setFillColor(sf::Color::White);
-                sanitizerSelectionClickable = false;
-                drawSanitizerDescription = false;
-            }
-            else if (soapSelectionRect.contains(mouseFloat)) {
-                playPauseButton.setFillColor(sf::Color::White);
-                playPauseClickable = false;
-                soapSelection.setFillColor(sf::Color::Yellow);
-                soapSelectionClickable = true;
-                drawSoapDescription = true;
-                sanitizerSelection.setFillColor(sf::Color::White);
-                sanitizerSelectionClickable = false;
-                drawSanitizerDescription = false;
-            }
-            else if (sanitizerSelectionRect.contains(mouseFloat)) {
-                playPauseButton.setFillColor(sf::Color::White);
-                playPauseClickable = false;
-                soapSelection.setFillColor(sf::Color::White);
-                soapSelectionClickable = false;
-                drawSoapDescription = false;
-                sanitizerSelection.setFillColor(sf::Color::Yellow);
-                sanitizerSelectionClickable = true;
-                drawSanitizerDescription = true;
-            }
-            else {
-                playPauseButton.setFillColor(sf::Color::White);
-                playPauseClickable = false;
-                soapSelection.setFillColor(sf::Color::White);
-                soapSelectionClickable = false;
-                drawSoapDescription = false;
-                sanitizerSelection.setFillColor(sf::Color::White);
-                sanitizerSelectionClickable = false;
-                drawSanitizerDescription = false;
-            }
+        // For each button, highlight it if it is clickable (mouse within borders)
+        if (playPauseRect.contains(mouseFloat)) {
+            playPauseButton.setFillColor(sf::Color::Yellow);
+            playPauseClickable = true;
+            soapSelection.setFillColor(sf::Color::White);
+            soapSelectionClickable = false;
+            sanitizerSelection.setFillColor(sf::Color::White);
+            sanitizerSelectionClickable = false;
         }
-        else if (clickClock.getElapsedTime().asSeconds() > CLICK_DELAY && leftMouseDown == MouseDown::PRESS) {
+        else if (soapSelectionRect.contains(mouseFloat)) {
+            playPauseButton.setFillColor(sf::Color::White);
+            playPauseClickable = false;
+            soapSelection.setFillColor(sf::Color::Yellow);
+            soapSelectionClickable = true;
+            sanitizerSelection.setFillColor(sf::Color::White);
+            sanitizerSelectionClickable = false;
+        }
+        else if (sanitizerSelectionRect.contains(mouseFloat)) {
             playPauseButton.setFillColor(sf::Color::White);
             playPauseClickable = false;
             soapSelection.setFillColor(sf::Color::White);
             soapSelectionClickable = false;
-            drawSoapDescription = false;
+            sanitizerSelection.setFillColor(sf::Color::Yellow);
+            sanitizerSelectionClickable = true;
+        }
+        else {
+            playPauseButton.setFillColor(sf::Color::White);
+            playPauseClickable = false;
+            soapSelection.setFillColor(sf::Color::White);
+            soapSelectionClickable = false;
             sanitizerSelection.setFillColor(sf::Color::White);
             sanitizerSelectionClickable = false;
-            drawSanitizerDescription = false;
         }
+        drawSoapDescription = soapSelectionClickable;
+        drawSanitizerDescription = sanitizerSelectionClickable;
+
+        // space key pauses game
+        if (spaceKeyDown == ButtonDown::PRESS && spaceKeyPressable
+            && playPauseClock.getElapsedTime().asSeconds() > CLICK_DELAY) {
+            //Play the click sound
+            mouseClickSound.play();
+
+            playPauseClock.restart();
+            // Round messages will go away when player clicks play
+            drawMessageText = false;
+            if (paused) {
+                paused = false;
+                playPauseButton.setFillColor(sf::Color::Red);
+                playPauseButton.setTexture(&pauseTexture);
+            }
+            else {
+                paused = true;
+                playPauseButton.setFillColor(sf::Color::Red);
+                playPauseButton.setTexture(&playTexture);
+            }
+        }
+        if (spaceKeyDown == ButtonDown::RELEASE
+            && spaceKeyClock.getElapsedTime().asSeconds() > CLICK_DELAY) {
+            spaceKeyPressable = true;
+        }
+        else {
+            spaceKeyPressable = false;
+        }
+
         // We can click buttons and place towers while paused
         // Determine if something was clicked
-        if (leftMouseDown == MouseDown::PRESS) {
+        if (leftMouseDown == ButtonDown::PRESS && leftMousePressable) {
             // Clicked the play/pause button
             if (playPauseClickable && playPauseClock.getElapsedTime().asSeconds() > CLICK_DELAY) {
+                // Restart the clickable timer
                 playPauseClock.restart();
+
+                //Play the click sound
+                mouseClickSound.play();
+
+                // Round messages will go away when player clicks play
+                drawMessageText = false;
                 if (paused) {
                     paused = false;
                     playPauseButton.setFillColor(sf::Color::Red);
@@ -331,20 +429,39 @@ int main() {
                 }
             }
             // Clicked the sanitizer tower selection button
-            else if (sanitizerSelectionClickable) {
+            else if (sanitizerSelectionClickable
+                     && sanitizerSelectionClock.getElapsedTime().asSeconds() > CLICK_DELAY) {
+                // Restart the clickable timer
+                sanitizerSelectionClock.restart();
+
                 if (player.getMoney() >= prices::SANITIZER_PRICE) {
+                    // Play the click sound
+                    mouseClickSound.play();
+
                     placeWhat = PlaceTower::SANITIZER;
                 }
                 else {
+                    // Can't click (not enough money)
+                    wrongClickSound.play();
+
                     sanitizerSelection.setFillColor(sf::Color::Red);
                 }
             }
             // Clicked the soap tower selection button
-            else if (soapSelectionClickable) {
+            else if (soapSelectionClickable
+                     && soapSelectionClock.getElapsedTime().asSeconds() > CLICK_DELAY) {
+                // Restart the clickable timer
+                soapSelectionClock.restart();
+
                 if (player.getMoney() >= prices::SOAP_PRICE) {
+                    //Play the click sound
+                    mouseClickSound.play();
                     placeWhat = PlaceTower::SOAP;
                 }
                 else {
+                    // Can't click (not enough money)
+                    wrongClickSound.play();
+
                     soapSelection.setFillColor(sf::Color::Red);
                 }
             }
@@ -356,6 +473,27 @@ int main() {
             else if (placeWhat == PlaceTower::SOAP) {
                 placeTowerConfirmed = true;
             }
+        }
+        if (leftMouseDown == ButtonDown::RELEASE
+            && leftMouseClock.getElapsedTime().asSeconds() > CLICK_DELAY) {
+            leftMousePressable = true;
+        }
+        else {
+            leftMousePressable = false;
+        }
+
+        if (rightMouseDown == ButtonDown::PRESS && rightMousePressable) {
+            if (placeWhat != PlaceTower::NONE) {
+                mouseClickSound.play();
+                placeWhat = PlaceTower::NONE;
+            }
+        }
+        if (rightMouseDown == ButtonDown::RELEASE
+            && rightMouseClock.getElapsedTime().asSeconds() > CLICK_DELAY) {
+            rightMousePressable = true;
+        }
+        else {
+            rightMousePressable = false;
         }
 
         switch (placeWhat) {
@@ -396,7 +534,8 @@ int main() {
                     towerVec.push_back(t);
 
                     // Pay for the tower
-                    player.setMoney(player.getMoney() - prices::SANITIZER_PRICE);
+                    player.loseMoney(prices::SANITIZER_PRICE);
+                    cashRegisterSound.play();
 
                     // reset values
                     delete towerIndicatorPtr;
@@ -407,7 +546,11 @@ int main() {
             }
             catch (int a) {
                 towerIndicatorPtr->getRect().setFillColor(sf::Color::Red);
-                placeTowerConfirmed = false;
+                if (placeTowerConfirmed) {
+                    // Player tried to confirm placing a tower
+                    wrongClickSound.play();
+                    placeTowerConfirmed = false;
+                }
                 }
             catch (...) {}
             break;
@@ -433,7 +576,8 @@ int main() {
                     towerVec.push_back(t);
 
                     // Pay for the tower
-                    player.setMoney(player.getMoney() - prices::SOAP_PRICE);
+                    player.loseMoney(prices::SOAP_PRICE);
+                    cashRegisterSound.play();
 
                     // reset values
                     delete towerIndicatorPtr;
@@ -444,7 +588,11 @@ int main() {
             }
             catch (int a) {
                 towerIndicatorPtr->getRect().setFillColor(sf::Color::Red);
-                placeTowerConfirmed = false;
+                if (placeTowerConfirmed) {
+                    // Player tried to confirm placing a tower
+                    wrongClickSound.play();
+                    placeTowerConfirmed = false;
+                }
                 }
             catch (...) {}
             break;
@@ -542,6 +690,12 @@ int main() {
         window.draw(soapSelection);
         if (drawSoapDescription) {
             window.draw(soapDescription);
+        }
+        if (drawSanitizerDescription) {
+            window.draw(sanitizerDescription);
+        }
+        if (drawMessageText) {
+            window.draw(messageText);
         }
         if (towerIndicatorPtr) {
             towerIndicatorPtr->draw(window);

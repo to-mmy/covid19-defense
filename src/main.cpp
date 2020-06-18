@@ -17,7 +17,7 @@
 #include "GamePlayScreen.h"
 // add resouce path
 //string ResourcePath = "/Users/fkk/Desktop/resources/";
-
+void readFromFile(std::string inFilename, HighScoreList &highScoreList);
 
 ///////// main /////////////
 int main(){
@@ -26,7 +26,9 @@ int main(){
     // menu
     MainMenuScreen menu(window.getSize().x, window.getSize().y);
 
-            HighScoreList highScoreList;
+    HighScoreList highScoreList;
+    readFromFile(menu::RESOURCE_PATH +"highscore.txt", highScoreList);
+
     while(window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)){
@@ -43,13 +45,14 @@ int main(){
 
             //test for the player score
             PlayerData p1, p2;
-            p1.setScore(12345);
-            p2.setScore(10000);
+            p1.setScore(8888);
+            p2.setScore(99);
             p2.setName("Player 2");
 
             highScoreList.insertNode(p1); // insert as the descending order
             highScoreList.insertNode(p2);
             highScoreList.writeToFile(menu::RESOURCE_PATH +"highscore.txt");
+
 
             PlayerData p3;
             p3.setName("Game Player");
@@ -67,7 +70,10 @@ int main(){
             }
             else if (gamePlayScreen.getGameOver()) {
                 GameOverScreen gameOverScreen(window);
-                gameOverScreen.displayEnd(window);
+//                gameOverScreen.displayEnd(window);
+                // change the displayEnd method, to display the current player score at the end
+                gameOverScreen.displayEnd(window, p3); // has been tested, work
+
             }
 
         } else if (choice == 1){ // high score
@@ -152,7 +158,43 @@ void loadFont(sf::Font& font, const std::string& fileName) {
         }
     }
 }
+// add method 6/18
+// to make sure each time when reopening the game, create/update the highscoreList
+// has been tested, work
+void readFromFile(std::string inFilename, HighScoreList &highScoreList) {
+    std::ifstream infile;
+    char name[13];
+    int score;
 
+    infile.open(inFilename);
+    if(!infile){
+        std::cout << "Error happened to open the input file!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+
+
+    while(!infile.eof()){
+        infile.read(name, 12);
+        infile >> score;
+        infile.ignore();
+
+        // trim trailing spaces
+        name[12] = 0;
+        // right trim extra white space
+        size_t size = strlen(name);
+        for (int i = size - 1; i > 0; --i)
+        {
+            if (!isspace(name[i])) break;
+            else name[i] = 0;
+        }
+        PlayerData pData;
+        pData.setName(name);
+        pData.setScore(score);
+        highScoreList.insertNode(pData);
+    }
+    infile.close();
+}
 
 
 

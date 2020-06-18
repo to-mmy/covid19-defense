@@ -18,6 +18,10 @@
 // add resouce path
 //string ResourcePath = "/Users/fkk/Desktop/resources/";
 
+sf::Vector2f normalize(const sf::Vector2f& vec);
+void loadTexture(sf::Texture&, const std::string&);
+void loadSound(sf::SoundBuffer&, const std::string&);
+void loadFont(sf::Font&, const std::string&);
 
 ///////// main /////////////
 int main(){
@@ -79,6 +83,15 @@ int main(){
     }
 
     return 0;
+}
+
+sf::Vector2f normalize(const sf::Vector2f& vec) {
+	float magnitude = sqrt((vec.x * vec.x) + (vec.y * vec.y));
+	if (magnitude == 0.f) {
+		return vec;
+	}
+	return sf::Vector2f(vec.x / magnitude, vec.y / magnitude);
+
 }
 
 void loadTexture(sf::Texture& texture, const std::string& fileName) {

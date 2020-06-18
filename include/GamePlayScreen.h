@@ -7,7 +7,6 @@
 #include "Path.h"
 #include "Ground.h"
 #include "Animation.h"
-#include "Enemy.h"
 #include "Tower.h"
 #include "Bullet.h"
 #include "PlaceTower.h"
@@ -62,12 +61,17 @@ public:
     bool getGameOver() const { return gameOver; }
     bool getGameVictory() const { return gameVictory; }
 
+    friend sf::Vector2f normalize(const sf::Vector2f& vec);
     friend void loadTexture(sf::Texture&, const std::string&);
     friend void loadSound(sf::SoundBuffer&, const std::string&);
     friend void loadFont(sf::Font&, const std::string&);
 
 private:
+
+    // Checks if tower placement is valid, returns position
     sf::Vector2f checkTowerPlacement(const sf::Vector2f&, GameMap* const, std::vector<Tower>&);
+    // Gets a pointer to the ground cell that the tower will be placed on
+    Cell* getLocation(sf::Vector2f towerCoords, GameMap& map);
     PlayerData player; // player data
 //    GameMap gameMap; // game map
     bool gameOver; // if the player lost
@@ -158,6 +162,7 @@ private:
 //    bool rightMousePressable;
 };
 
+sf::Vector2f normalize(const sf::Vector2f& vec);
 void loadTexture(sf::Texture&, const std::string&);
 void loadSound(sf::SoundBuffer&, const std::string&);
 void loadFont(sf::Font&, const std::string&);

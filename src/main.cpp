@@ -21,7 +21,6 @@ namespace menu {
     const int NUM_OF_MENU_CHOICES = 3;
     const std::string RESOURCE_PATH = "resources\\";
 }
-
 void readFromFile(std::string inFilename, HighScoreList &highScoreList);
 
 ///////// main /////////////
@@ -53,9 +52,15 @@ int main(){
                 default: break;
             }
         }
-
-        int choice = menu.displayMenu(window);
+        std::string playername = "aa";
+        int choice = menu.displayMenu(window, playername);
         if(choice == 0){ // play
+            //////// for testing the userinput name
+            std::cout << "in main: updated player name :" << playername << std::endl;
+            //////// when game start, need to set player name
+            //
+
+
 
             //test for the player score
             PlayerData p1, p2;
@@ -85,7 +90,7 @@ int main(){
             else if (gamePlayScreen.getGameOver()) {
                 GameOverScreen gameOverScreen(window);
 //                gameOverScreen.displayEnd(window);
-                // change the displayEnd method, to display the current player score at the end
+                ///////// change the displayEnd method, to display the current player score at the end
                 gameOverScreen.displayEnd(window, p3); // has been tested, work
 
             }
@@ -94,6 +99,7 @@ int main(){
             HighscoreScreen hSScreen(window);
             choice = hSScreen.draw(window);
         } else if (choice == 2) { // exit
+            backgroundMusic.stop();
             window.close();
         }
     }

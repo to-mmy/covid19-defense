@@ -30,9 +30,11 @@ public:
 
     int GetPressedItem() { return selectedItemIndex; }
 
-    void displayWelcome(sf::RenderWindow &window);
+//    void displayWelcome(sf::RenderWindow &window);
+//    int displayMenu(sf::RenderWindow &window);
+    int displayMenu(sf::RenderWindow &window, std::string &playerName);
+    std::string displayWelcome(sf::RenderWindow& window);
 
-    int displayMenu(sf::RenderWindow &window);
 };
 
 

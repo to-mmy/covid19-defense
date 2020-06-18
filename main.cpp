@@ -44,7 +44,7 @@ int main(){
                 // during game, if die,
                 // 1. save the score into the highscore list
                 // 2. call gameoverscreen, show the player score
-                        // in gameoverscreen, if press back, show high score screen
+                        // press back to main menu
                 GameOverScreen gameOverScreen(window);
                 gameOverScreen.displayEnd(window);
 

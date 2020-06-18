@@ -5,6 +5,7 @@
 #include <fstream>
 #include "mainMenuScreen.h"
 #include <SFML/Audio.hpp>
+#include <sstream>
 
 
 MainMenuScreen::MainMenuScreen(float width, float height){
@@ -46,16 +47,20 @@ void MainMenuScreen::draw(sf::RenderWindow &window){
     window.draw(exitButton);
 }
 
-void MainMenuScreen::displayWelcome(sf::RenderWindow &window) {
+std::string MainMenuScreen::displayWelcome(sf::RenderWindow& window)
+{
     std::string textFromFile, buffer;
     std::ifstream fin (menu::RESOURCE_PATH + "welcome.txt");
     if (!fin)
     {
         std::cout << "Cannot open welcome file." << std::endl;
-        return;
     }
-    while (std::getline(fin,buffer))
+    while (getline(fin,buffer))
         textFromFile += buffer += '\n';
+    std::ostringstream sout;
+    sout << std::endl;
+    textFromFile += sout.str();
+    textFromFile += "Please type your name and press Enter ===> ";
     fin.close();
 
     // Text
@@ -74,34 +79,44 @@ void MainMenuScreen::displayWelcome(sf::RenderWindow &window) {
 
     fin.close();
 
-    sf::Event event;
-    while (window.isOpen())
-    {
-        while (window.pollEvent(event))
-        {
-            switch (event.type)
-            {
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-                case sf::Event::KeyPressed:
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-                    {
-                        window.clear();
-                        // start the game
-                        return;
+    std::string name = "";
+    while(window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                case sf::Event::TextEntered:
+                    if (event.text.unicode < 128) {
+                        if (event.text.unicode == 13 || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) // return key
+                        {
+                            window.clear();
+                            return name; // finished entering name
+                        }
+                        else if (event.text.unicode == 8) { // backspace
+                            if (name.size() > 0)
+                                name.resize(name.size() - 1);
+                        }
+                        else {
+                            name += static_cast<char>(event.text.unicode);
+//                            std::cout << "\t\teach letter:" << name << ";;\n";
+                        }
                     }
-                default:
                     break;
+                case sf::Event::Closed:
+                        window.close();
+                        break;
+                default:
+                    ;
             }
         }
         window.clear();
+        text.setString((textFromFile+name).c_str());
         window.draw(text);
         window.display();
     }
+    return name;
 }
 
-int MainMenuScreen::displayMenu(sf::RenderWindow &window) {
+int MainMenuScreen::displayMenu(sf::RenderWindow &window, std::string &playerName) {
     sf::Vector2f BackgroundSize;
     sf::RectangleShape background(sf::Vector2f(window.getSize().x, window.getSize().y));
     sf::Texture backgroundTexture;
@@ -114,9 +129,11 @@ int MainMenuScreen::displayMenu(sf::RenderWindow &window) {
     if (playButton.getGlobalBounds().contains(mouse)){
         playButton.setFillColor(sf::Color::Red);
         if(sf::Mouse::isButtonPressed((sf::Mouse::Left))){
-            //std::cout << "\tyeah, left clicked" << std::endl;
             selectedItemIndex = 0;
-            displayWelcome(window);
+//            displayWelcome(window);
+
+/////////////change to welcome method
+            playerName = displayWelcome(window);
         }
     }else
         playButton.setFillColor(sf::Color::Black);
@@ -143,7 +160,6 @@ int MainMenuScreen::displayMenu(sf::RenderWindow &window) {
     window.draw(background);
     draw(window);
     window.display();
-
 
     return selectedItemIndex;
 }

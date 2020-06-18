@@ -9,11 +9,8 @@
 #include <string>
 #include <cmath>
 
-# include <queue>
-
 # include "corona.h"
 
-sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt);
 sf::Vector2f normalize(const sf::Vector2f& vec);
 
 int main()
@@ -66,7 +63,9 @@ int main()
     7,7
     */
 
-    GameMap gameMap(std::string("map_1_data"));
+    const sf::Vector2f GAME_MAP_ORIGIN = sf::Vector2f(0.f, 0.f);
+
+    GameMap gameMap(std::string("map_1_data"), GAME_MAP_ORIGIN);
 
     // Reduce function calls
     unsigned sideLen = gameMap.getSideLength();
@@ -102,10 +101,31 @@ int main()
         }
     }
 
+/*
+    sf::Sprite covid;
+    covid.setTexture(covidTexture);
+    sf::Vector2u covidCoords = gameMap.getStartCoords();
 
-    /**/
+    Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+    covid.setPosition(GAME_MAP_ORIGIN + pathPtr->getPosition());
+
+    covid.setScale(game_map::SPRITE_SCALE);
+
+    const float COVID_SPEED = 0.05f;
+
+    sf::Vector2f covidDirection;
+    sf::Vector2f covidDestination = GAME_MAP_ORIGIN + pathPtr->getNextPosition();
+    sf::Vector2f distanceToDestination(std::abs(covidDestination.x - covid.getPosition().x),
+                                       std::abs(covidDestination.y - covid.getPosition().y));
+
+    bool drawCovid = true;
+    //covid.setPosition(getCellPositionFromCoordinates(pathPtr->getNextCoords(), SIDE_FLT));
+
+*/
+
+/**/
     // Create coronavirus object
-    corona coronavirus(covidTexture, gameMap);
+    Corona coronavirus(covidTexture, gameMap, GAME_MAP_ORIGIN);
 
 
 
@@ -139,27 +159,26 @@ int main()
                 window.close();
         }
 
-        if (corona.getDrawCovid()) {
+        if (coronavirus.getDrawCovid()) {
             // Check if the covid has made it to next path
-            corona.setDistanceToDestination = sf::Vector2f(abs(covidDestination.x - covid.getPosition().x),
-                                                 abs(covidDestination.y - covid.getPosition().y)
-                                                 );
-            if (std::abs(corona.getDistanceToDestination.x) < 1.f
-                && std::abs(corona.getDistanceToDestination.y) < 1.f) {
-                corona.setCovidCoords = corona.getPathPtr->getNextCoords();
-                corona.setPathPtr( dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]));
-                corona.setCovidDestination(getCellPositionFromCoordinates(pathPtr->getNextCoords(),
-                                                                  game_map::SIDE_FLT));
+            coronavirus.setDistanceToDestination( sf::Vector2f(abs(coronavirus.getCovidDestination().x - coronavirus.getSprite().getPosition().x),
+                                                 abs(coronavirus.getCovidDestination().y - coronavirus.getSprite().getPosition().y)
+                                                 ));
+            if (std::abs(coronavirus.getDistanceToDestination().x) < 1.f
+                && std::abs(coronavirus.getDistanceToDestination().y) < 1.f) {
+                coronavirus.setCovidCoords(coronavirus.getPathPtr()->getNextCoords());
+                coronavirus.setPathPtr( dynamic_cast<Path*>(gameMap.getCells()[coronavirus.getCovidCoords().x][coronavirus.getCovidCoords().y]));
+                coronavirus.setCovidDestination(coronavirus.getPathPtr()->getNextPosition());
                 // Check if covid has made it to the end
-                if (corona.getPathPtr->getNextCoords() == gameMap.getExitCoords()) {
-                    corona.setDrawCovid( false);
+                if (coronavirus.getPathPtr()->getNextCoords() == gameMap.getExitCoords()) {
+                    coronavirus.setDrawCovid( false);
                 }
             }
 
 
             // Move the covid
-            corona.setCovidDirection(normalize(covidDestination - covid.getPosition());
-            corona.move(corona.getCovidSpeed() * corona.getCovidDirection());
+            coronavirus.setCovidDirection(normalize(coronavirus.getCovidDestination() - coronavirus.getSprite().getPosition()));
+            coronavirus.getSprite().move(coronavirus.getMoveSpeed() * coronavirus.getCovidDirection());
         }
 
 
@@ -167,18 +186,13 @@ int main()
         // Draw
         window.clear();
         gameMap.draw(window);
-        if (corona.getDrawCovid()) {
-            window.draw(covid);
+        if (coronavirus.getDrawCovid()) {
+            window.draw(coronavirus.getSprite());
         }
         window.display();
     }
 
     return 0;
-}
-
-sf::Vector2f getCellPositionFromCoordinates(const sf::Vector2u& coords, const float& sideFlt) {
-    return sf::Vector2f(static_cast<float>(coords.y) * sideFlt,
-                        static_cast<float>(coords.x) * sideFlt);
 }
 
 sf::Vector2f normalize(const sf::Vector2f& vec) {

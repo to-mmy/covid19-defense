@@ -18,7 +18,7 @@ class Corona : public enemyBase{
     float movespeed;
     bool drawCovid;
 
-    Path* pathPtr;
+    //Path* pathPtr;
 
     sf::Vector2f covidDirection;
     sf::Vector2f covidDestination;
@@ -27,7 +27,7 @@ class Corona : public enemyBase{
 
 public:
     Corona(){}
-    Corona(sf::Texture textureIn, GameMap gameMap, sf::Vector2f GAME_MAP_ORIGIN);
+    Corona(sf::Texture textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr);
     ~Corona(){}
 
     // getter/setters
@@ -37,8 +37,9 @@ public:
     void setDrawCovid(bool drawCovidIn){drawCovid = drawCovidIn;}
     bool getDrawCovid(){return drawCovid;}
 
-    void setPathPtr(Path* pathIn){pathPtr = pathIn;}
-    Path* getPathPtr(){return pathPtr;}
+    //bypass
+    //void setPathPtr(Path* pathIn){pathPtr = pathIn;}
+    //Path* getPathPtr(){return pathPtr;}
 
     void setCovidDirection(sf::Vector2f directionIn){covidDirection = directionIn;}
     sf::Vector2f getCovidDirection(){return covidDirection;}
@@ -53,19 +54,19 @@ public:
     sf::Vector2u getCovidCoords(){return covidCoords;}
 };
 
-Corona::Corona(sf::Texture textureIn, GameMap gameMap, sf::Vector2f GAME_MAP_ORIGIN) : movespeed (0.05f), enemyBase() {
+Corona::Corona(sf::Texture textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr) : movespeed (0.05f), enemyBase() {
     sprite.setTexture(textureIn);
 
 /**/
 
     sprite.setTexture(textureIn);
 
-    sf::Vector2u newCovidCoords(gameMap.getStartCoords());
+    sf::Vector2u newCovidCoords(gameMap->getStartCoords());
     covidCoords = newCovidCoords;
 
     sprite.setPosition(GAME_MAP_ORIGIN + pathPtr->getPosition());
 
-    pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+    pathPtr = dynamic_cast<Path*>(gameMap->getCells()[covidCoords.x][covidCoords.y]);
 
 
     //covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),

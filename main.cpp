@@ -125,29 +125,10 @@ int main()
 
 /**/
     // Create coronavirus object
-    Corona coronavirus(covidTexture, gameMap, GAME_MAP_ORIGIN);
+    sf::Vector2u startCoords = gameMap.getStartCoords();
+    Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[startCoords.x][startCoords.y]);
 
-
-
-/*      Moving all of this stuff to the enemy classes
-    sf::Sprite covid;
-    covid.setTexture(covidTexture);
-    sf::Vector2u covidCoords = gameMap.getStartCoords();
-    covid.setPosition(getCellPositionFromCoordinates(covidCoords, game_map::SIDE_FLT));
-
-    Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
-
-    const float covidSpeed = 0.05f;
-
-    sf::Vector2f covidDirection;
-    sf::Vector2f covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
-                                                                   game_map::SIDE_FLT);
-    sf::Vector2f distanceToDestination(std::abs(covidDestination.x - covid.getPosition().x),
-                                       std::abs(covidDestination.y - covid.getPosition().y));
-
-    bool drawCovid = true;
-    //covid.setPosition(getCellPositionFromCoordinates(pathPtr->getNextCoords(), SIDE_FLT));
-*/
+    Corona coronavirus(covidTexture, &gameMap, GAME_MAP_ORIGIN, pathPtr);
 
     // Render loop
     while (window.isOpen())
@@ -166,11 +147,11 @@ int main()
                                                  ));
             if (std::abs(coronavirus.getDistanceToDestination().x) < 1.f
                 && std::abs(coronavirus.getDistanceToDestination().y) < 1.f) {
-                coronavirus.setCovidCoords(coronavirus.getPathPtr()->getNextCoords());
-                coronavirus.setPathPtr( dynamic_cast<Path*>(gameMap.getCells()[coronavirus.getCovidCoords().x][coronavirus.getCovidCoords().y]));
-                coronavirus.setCovidDestination(coronavirus.getPathPtr()->getNextPosition());
+                coronavirus.setCovidCoords(pathPtr->getNextCoords());
+                pathPtr = dynamic_cast<Path*>(gameMap.getCells()[coronavirus.getCovidCoords().x][coronavirus.getCovidCoords().y]);
+                coronavirus.setCovidDestination(pathPtr->getNextPosition());
                 // Check if covid has made it to the end
-                if (coronavirus.getPathPtr()->getNextCoords() == gameMap.getExitCoords()) {
+                if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
                     coronavirus.setDrawCovid( false);
                 }
             }

@@ -4,10 +4,16 @@
 
 #ifndef FINALPROJECT_HIGHSCORESCREEN_H
 #define FINALPROJECT_HIGHSCORESCREEN_H
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include<string>
 
-const int numScores = 10;
+namespace menu {
+extern const std::string RESOURCE_PATH;
+}
+
+namespace scores {
+const int NUM_SCORES = 10;
+}
 
 class HighscoreScreen {
 private:
@@ -15,14 +21,14 @@ private:
     sf::Font hsFont;
     sf::Text hsName;
     sf::Text exitButton;
-    sf::Text scores[numScores];
+    sf::Text scores[scores::NUM_SCORES];
 public:
     HighscoreScreen(sf::RenderWindow &window);
     ~HighscoreScreen(){};
     int draw(sf::RenderWindow& window);
 };
 HighscoreScreen::HighscoreScreen(sf::RenderWindow &window) {
-    if (!hsFont.loadFromFile(ResourcePath + "Jingle Bells.ttf"))
+    if (!hsFont.loadFromFile(menu::RESOURCE_PATH + "Jingle Bells.ttf"))
     {
         std::cout << "Can't find font" << std::endl;
     }
@@ -41,14 +47,14 @@ HighscoreScreen::HighscoreScreen(sf::RenderWindow &window) {
 int HighscoreScreen::draw(sf::RenderWindow & window)
 {
     selectedItemIndex = -1;
-    std::ifstream fin(ResourcePath + "highscore.txt");
+    std::ifstream fin(menu::RESOURCE_PATH + "highscore.txt");
     std::string line;
     if(!fin){
-        cerr << "Error opening the fin highscore.txt" << endl;
+        std::cerr << "Error opening the fin highscore.txt" << std::endl;
         exit(1);
     }
 
-    for (int i = 0; i < numScores; i++)
+    for (int i = 0; i < scores::NUM_SCORES; i++)
     {
         std::getline(fin, line);
 

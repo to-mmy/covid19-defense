@@ -6,3 +6,8 @@ void Cell::setCoords(const sf::Vector2u& indices) {
                             static_cast<float>(indices.x) * game_map::SIDE_FLT
                             );
 }
+
+void Cell::setSpritePosition(const sf::Vector2f& pos) {
+        position = pos;
+        cellSprite.setPosition(pos);
+    }

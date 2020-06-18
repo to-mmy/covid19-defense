@@ -3,6 +3,7 @@
 
 #include "CellEnum.h"
 #include "GameMap.h"
+#include "coordsToPosition.h"
 #include <SFML/Graphics.hpp>
 
 namespace game_map { // forward declaration
@@ -30,12 +31,8 @@ public:
     Cell() = default;
     // r = row = y coordinate, c = col = x coordinate
     Cell(unsigned r, unsigned c) : coords(r,c),
-                                   position(static_cast<float>(c) * game_map::SIDE_FLT,
-                                            static_cast<float>(r) * game_map::SIDE_FLT
-                                            ) {}
-    Cell(const sf::Vector2u& v) : coords(v), position(static_cast<float>(v.y) * game_map::SIDE_FLT,
-                                                      static_cast<float>(v.x) * game_map::SIDE_FLT
-                                                      ) {}
+                                   position(game_map::coordsToPosition(coords)) {}
+    Cell(const sf::Vector2u& v) : coords(v), position(game_map::coordsToPosition(v)) {}
 
     virtual ~Cell() = default;
 
@@ -46,8 +43,10 @@ public:
         cellSprite.setTexture(texture);
     }
     // Sprite position
-    virtual void setSpritePosition(const sf::Vector2f& pos) final {
-        cellSprite.setPosition(pos);
+    virtual void setSpritePosition(const sf::Vector2f& pos) final;
+    // Sprite scale
+    virtual void setSpriteScale(const sf::Vector2f& scale) final {
+        cellSprite.setScale(scale);
     }
 
     // Getters, non-overrideable

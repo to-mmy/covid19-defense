@@ -6,11 +6,15 @@
 #define FINALPROJECT_GAMEOVERSCREEN_H
 #include "SFML/Graphics.hpp"
 //#include "SFML/Audio.hpp"
-#include "playerScore.h"
+#include "PlayerData.h"
 
 #include <iostream>
 #include <string>
 
+
+namespace menu {
+extern const std::string RESOURCE_PATH;
+}
 
 namespace States {
     class GameOverScreen {
@@ -32,7 +36,7 @@ GameOverScreen::GameOverScreen(sf::RenderWindow &window)
 
 
 
-    if (!font.loadFromFile(ResourcePath + "Jingle Bells.ttf"))
+    if (!font.loadFromFile(menu::RESOURCE_PATH + "Jingle Bells.ttf"))
     {
         std::cout << "Can't find font" << std::endl;
     }

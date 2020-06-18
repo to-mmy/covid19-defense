@@ -25,6 +25,9 @@ public:
     PlayerData(const std::string& playerName = "Player 1",
                const sf::Vector2f& drOrigin = sf::Vector2f(0.f, 0.f));
 
+    // Copy constructor
+    PlayerData(const PlayerData&);
+
     // Setters
     void setMoney(int m) { money = m; }
     void setScore(int s) { score = s; }

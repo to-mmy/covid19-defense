@@ -128,7 +128,7 @@ int main()
     sf::Vector2u startCoords = gameMap.getStartCoords();
     Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[startCoords.x][startCoords.y]);
 
-    Corona coronavirus(covidTexture, &gameMap, GAME_MAP_ORIGIN, pathPtr);
+    Corona coronavirus(&covidTexture, &gameMap, GAME_MAP_ORIGIN, pathPtr);
 
     // Render loop
     while (window.isOpen())
@@ -143,8 +143,7 @@ int main()
         if (coronavirus.getDrawCovid()) {
             // Check if the covid has made it to next path
             coronavirus.setDistanceToDestination( sf::Vector2f(abs(coronavirus.getCovidDestination().x - coronavirus.getSprite().getPosition().x),
-                                                 abs(coronavirus.getCovidDestination().y - coronavirus.getSprite().getPosition().y)
-                                                 ));
+                                                 abs(coronavirus.getCovidDestination().y - coronavirus.getSprite().getPosition().y)));
             if (std::abs(coronavirus.getDistanceToDestination().x) < 1.f
                 && std::abs(coronavirus.getDistanceToDestination().y) < 1.f) {
                 coronavirus.setCovidCoords(pathPtr->getNextCoords());

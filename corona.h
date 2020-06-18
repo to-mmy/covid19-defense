@@ -27,7 +27,7 @@ class Corona : public enemyBase{
 
 public:
     Corona(){}
-    Corona(sf::Texture textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr);
+    Corona(sf::Texture* textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr);
     ~Corona(){}
 
     // getter/setters
@@ -54,12 +54,12 @@ public:
     sf::Vector2u getCovidCoords(){return covidCoords;}
 };
 
-Corona::Corona(sf::Texture textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr) : movespeed (0.05f), enemyBase() {
-    sprite.setTexture(textureIn);
+Corona::Corona(sf::Texture* textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr) : movespeed (0.05f), enemyBase() {
+    sprite.setTexture(*textureIn);
 
 /**/
 
-    sprite.setTexture(textureIn);
+    sprite.setTexture(*textureIn);
 
     sf::Vector2u newCovidCoords(gameMap->getStartCoords());
     covidCoords = newCovidCoords;

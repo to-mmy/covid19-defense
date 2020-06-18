@@ -43,6 +43,16 @@ extern const float CLICK_DELAY;
 }
 
 class GamePlayScreen {
+private:
+    // Checks if tower placement is valid, returns position
+    sf::Vector2f checkTowerPlacement(const sf::Vector2f&, GameMap* const, std::vector<Tower>&);
+    // Gets a pointer to the ground cell that the tower will be placed on
+    Cell* getLocation(sf::Vector2f towerCoords, GameMap& map);
+
+    PlayerData player; // player data
+    bool gameOver; // if the player lost
+    bool gameVictory; // if the player won
+    bool windowClosed; // If the window was closed
 public:
     GamePlayScreen() = default;
     // Construct from a player name and a map file
@@ -66,100 +76,7 @@ public:
     friend void loadSound(sf::SoundBuffer&, const std::string&);
     friend void loadFont(sf::Font&, const std::string&);
 
-private:
 
-    // Checks if tower placement is valid, returns position
-    sf::Vector2f checkTowerPlacement(const sf::Vector2f&, GameMap* const, std::vector<Tower>&);
-    // Gets a pointer to the ground cell that the tower will be placed on
-    Cell* getLocation(sf::Vector2f towerCoords, GameMap& map);
-    PlayerData player; // player data
-//    GameMap gameMap; // game map
-    bool gameOver; // if the player lost
-    bool gameVictory; // if the player won
-    bool windowClosed; // If the window was closed
-//    bool paused; // if game is currently paused
-//    bool waveGoing; // if a wave is currently going
-//    int waveNumber; // # of current wave, 0 to 4
-//    int bulletGeneration; // to create gaps between generation of bullets
-//    // towers
-//    std::vector<Bullet> bulletVec;
-//    std::vector<Tower> towerVec;
-//    std::vector<Tower> shootingTowers;
-//    // tower textures
-//    sf::Texture soapTexture;
-//    sf::Texture sanitizerTexture;
-//    // button textures
-//    sf::Texture pauseTexture;
-//    sf::Texture playTexture;
-//    sf::Texture soapSelectTexture;
-//    sf::Texture sanitizerSelectTexture;
-//    // buttons
-//    sf::RectangleShape playPauseButton;
-//    sf::RectangleShape soapSelection;
-//    sf::RectangleShape sanitizerSelection;
-//    // boundaries of buttons
-//    sf::FloatRect playPauseRect;
-//    sf::FloatRect soapSelectionRect;
-//    sf::FloatRect sanitizerSelectionRect;
-//    // if the buttons are currently clickable
-//    bool playPauseClickable;
-//    bool soapSelectionClickable;
-//    bool sanitizerSelectionClickable;
-//    // text font
-//    sf::Font descriptionFont;
-//    // hover text for buy buttons
-//    sf::Text soapDescription;
-//    sf::Text sanitizerDescription;
-//    // if descriptions should be displayed
-//    bool drawSoapDescription;
-//    bool drawSanitizerDescription;
-//    sf::Text messageText; // general game message text
-//    bool drawMessageText; // if message text should be displayed
-//    // to show where tower will be placed
-//    Tower soapIndicator;
-//    Tower sanitizerIndicator;
-//    bool drawSoapIndicator;
-//    bool drawSanitizerIndicator;
-//    // bullet textures
-//    sf::Texture squirtTexture;
-//    sf::Texture bubbleTexture;
-//    // bullet sounds
-//    sf::SoundBuffer squirtBuffer;
-//    sf::Sound squirtSound;
-//    // interactive sounds
-//    sf::SoundBuffer mouseClickBuffer;
-//    sf::Sound mouseClickSound;
-//    sf::SoundBuffer wrongClickBuffer;
-//    sf::Sound wrongClickSound;
-//    sf::SoundBuffer cashRegisterBuffer;
-//    sf::Sound cashRegisterSound;
-//    // tower animations
-//    Animation soapAnimation;
-//    Animation sanitizerAnimation;
-//    // to time the tower animations
-//    float animationDeltaTime;
-//    sf::Clock animationClock;
-//    // store mouse location
-//    sf::Vector2i mousePos;
-//    sf::Vector2f mouseFloat;
-//    // to time inputs so they don't repeatedly trigger
-//    sf::Clock spaceKeyClock;
-//    sf::Clock leftMouseClock;
-//    sf::Clock rightMouseClock;
-//    sf::Clock playPauseClock;
-//    sf::Clock soapSelectionClock;
-//    sf::Clock sanitizerSelectionClock;
-//    PlaceTower placeWhat; // to determine what kind of tower is being placed
-//    bool placeTowerConfirmed; // if the player has clicked to place a tower
-//    // input events
-//    sf::Event event;
-//    // hold whether a button is pressed/held/released
-//    ButtonDown spaceKeyDown;
-//    ButtonDown leftMouseDown;
-//    ButtonDown rightMouseDown;
-//    bool spaceKeyPressable;
-//    bool leftMousePressable;
-//    bool rightMousePressable;
 };
 
 sf::Vector2f normalize(const sf::Vector2f& vec);

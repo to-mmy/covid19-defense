@@ -1,9 +1,10 @@
 #include "GamePlayScreen.h"
 
 #include "Collision.h"
-//#include "BulletSprite.h"
+#include "enemyBase.h"
+#include "corona.h"
 
-#include <queue>
+#include <deque>
 
 namespace draw {
 const sf::Vector2f PLAYER_DRAW_ORIGIN = sf::Vector2f(730.f, 630.f);
@@ -48,200 +49,12 @@ namespace input {
 const float CLICK_DELAY = 0.2f;
 }
 
-//GamePlayScreen::GamePlayScreen(const std::string& playerName, const std::string& mapFile)
-//    : player(playerName, draw::PLAYER_DRAW_ORIGIN),
-//      gameMap(mapFile, draw::GAME_MAP_ORIGIN),
-//      gameOver(false),
-//      gameVictory(false),
-//      windowClosed(false),
-//      paused(true),
-//      waveGoing(false),
-//      waveNumber(0),
-//      bulletGeneration(0),
-//      bulletVec(),
-//      towerVec(),
-//      shootingTowers(),
-//      playPauseButton(sf::Vector2f(game_map::SIDE_FLT, game_map::SIDE_FLT)),
-//      soapSelection(sf::Vector2f(game_map::SIDE_FLT, game_map::SIDE_FLT)),
-//      sanitizerSelection(sf::Vector2f(game_map::SIDE_FLT, game_map::SIDE_FLT)),
-//      playPauseClickable(false),
-//      soapSelectionClickable(false),
-//      sanitizerSelectionClickable(false),
-//      drawSoapDescription(false),
-//      drawSanitizerDescription(false),
-//      drawMessageText(true),
-//      soapIndicator(sf::Vector2f(game_map::SIDE_FLT, game_map::SIDE_FLT),
-//                    sf::Vector2f(0.f,0.f), "soap"),
-//      sanitizerIndicator(sf::Vector2f(game_map::SIDE_FLT, game_map::SIDE_FLT),
-//                         sf::Vector2f(0.f,0.f), "sanitizer"),
-//      drawSoapIndicator(false),
-//      drawSanitizerIndicator(false),
-//      soapAnimation(&soapTexture, sf::Vector2u(3, 1), 0.3f),
-//      sanitizerAnimation(&sanitizerTexture, sf::Vector2u(3, 1), 0.3f),
-//      animationDeltaTime(0.f),
-//      animationClock(),
-//      mousePos(-1, -1),
-//      mouseFloat(mousePos),
-//      spaceKeyClock(),
-//      leftMouseClock(),
-//      rightMouseClock(),
-//      playPauseClock(),
-//      soapSelectionClock(),
-//      sanitizerSelectionClock(),
-//      placeWhat(PlaceTower::NONE),
-//      placeTowerConfirmed(false),
-//      event(),
-//      spaceKeyDown(ButtonDown::RELEASE),
-//      leftMouseDown(ButtonDown::RELEASE),
-//      rightMouseDown(ButtonDown::RELEASE),
-//      spaceKeyPressable(false),
-//      leftMousePressable(false),
-//      rightMousePressable(false)
-//      {
-//    // textures
-//    loadTexture(soapTexture, std::string(game_map::RESOURCE_PATH
-//                                         + "bar_soap_transparent.png"));
-//    loadTexture(sanitizerTexture, std::string(game_map::RESOURCE_PATH
-//                                              + "sanitizer_bottle_transparent.png"));
-//
-//    loadTexture(pauseTexture, std::string(game_map::RESOURCE_PATH + "pause_button.png"));
-//    loadTexture(playTexture, std::string(game_map::RESOURCE_PATH + "play_button.png"));
-//    loadTexture(soapSelectTexture, std::string(game_map::RESOURCE_PATH
-//                                               + "bar_soap_selection.png"));
-//    loadTexture(sanitizerSelectTexture, std::string(game_map::RESOURCE_PATH
-//                                                    + "sanitizer_bottle_selection.png"));
-//
-//    // buttons
-//    playPauseButton.setTexture(&playTexture);
-//    playPauseButton.setPosition(sf::Vector2f((gameMap.getSideLength() * game_map::SIDE_FLT)
-//                                             + draw::SPACER,
-//                                             (game_map::SIDE_FLT + draw::SPACER) * 0.f)
-//                                ); // 0th down
-//
-//    soapSelection.setTexture(&soapSelectTexture);
-//    soapSelection.setPosition(sf::Vector2f((gameMap.getSideLength() * game_map::SIDE_FLT)
-//                                           + draw::SPACER,
-//                                           (game_map::SIDE_FLT + draw::SPACER) * 1.f)
-//                              ); // 1st down
-//
-//    sanitizerSelection.setTexture(&sanitizerSelectTexture);
-//    sanitizerSelection.setPosition(sf::Vector2f((gameMap.getSideLength() * game_map::SIDE_FLT)
-//                                                + draw::SPACER,
-//                                                (game_map::SIDE_FLT + draw::SPACER) * 2.f)
-//                                   ); // 2nd down
-//
-//    // Rects holding bounds of the buttons, for checking mouse input
-//    playPauseRect = playPauseButton.getGlobalBounds();
-//    soapSelectionRect = soapSelection.getGlobalBounds();
-//    sanitizerSelectionRect = sanitizerSelection.getGlobalBounds();
-//    loadTexture(soapTexture, std::string(game_map::RESOURCE_PATH
-//                                         + "bar_soap_transparent.png"));
-//    loadTexture(sanitizerTexture, std::string(game_map::RESOURCE_PATH
-//                                              + "sanitizer_bottle_transparent.png"));
-//
-//    //loading textures for tower selection
-//    loadTexture(pauseTexture, std::string(game_map::RESOURCE_PATH + "pause_button.png"));
-//    loadTexture(playTexture, std::string(game_map::RESOURCE_PATH + "play_button.png"));
-//    loadTexture(soapSelectTexture, std::string(game_map::RESOURCE_PATH
-//                                               + "bar_soap_selection.png"));
-//    loadTexture(sanitizerSelectTexture, std::string(game_map::RESOURCE_PATH
-//                                                    + "sanitizer_bottle_selection.png"));
-//
-//    // positioning selection buttons
-//    playPauseButton.setTexture(&playTexture);
-//    playPauseButton.setPosition(sf::Vector2f((gameMap.getSideLength() * game_map::SIDE_FLT)
-//                                             + draw::SPACER,
-//                                             (game_map::SIDE_FLT + draw::SPACER) * 0.f)
-//                                ); // 0th down
-//
-//    soapSelection.setTexture(&soapSelectTexture);
-//    soapSelection.setPosition(sf::Vector2f((gameMap.getSideLength() * game_map::SIDE_FLT)
-//                                           + draw::SPACER,
-//                                           (game_map::SIDE_FLT + draw::SPACER) * 1.f)
-//                              ); // 1st down
-//    sanitizerSelection.setTexture(&sanitizerSelectTexture);
-//    sanitizerSelection.setPosition(sf::Vector2f((gameMap.getSideLength() * game_map::SIDE_FLT)
-//                                                + draw::SPACER,
-//                                                (game_map::SIDE_FLT + draw::SPACER) * 2.f)
-//                                   ); // 2nd down
-//
-//    // Rects holding bounds of the buttons, for checking mouse input
-//    sf::FloatRect playPauseRect = playPauseButton.getGlobalBounds();
-//    sf::FloatRect soapSelectionRect = soapSelection.getGlobalBounds();
-//    sf::FloatRect sanitizerSelectionRect = sanitizerSelection.getGlobalBounds();
-//
-//    // Descriptions for buttons
-//    loadFont(descriptionFont, std::string(game_map::RESOURCE_PATH + "Jingle Bells.ttf"));
-//    soapDescription.setFont(descriptionFont);
-//    soapDescription.setPosition(soapSelection.getPosition()
-//                                + sf::Vector2f(game_map::SIDE_FLT + draw::SPACER, 0.f));
-//    soapDescription.setCharacterSize(game_map::SIDE_PIX / 4);
-//    std::ostringstream soapDescriptionString;
-//    soapDescriptionString << "Soap Tower\nCost: " << prices::SOAP_PRICE
-//                          << "\nFires soap bubbles.";
-//    soapDescription.setString(soapDescriptionString.str());
-//    soapDescription.setFillColor(sf::Color::White);
-//
-//    sanitizerDescription.setFont(descriptionFont);
-//    sanitizerDescription.setPosition(sanitizerSelection.getPosition()
-//                                     + sf::Vector2f(game_map::SIDE_FLT + draw::SPACER, 0.f));
-//    sanitizerDescription.setCharacterSize(game_map::SIDE_PIX / 4);
-//    std::ostringstream sanitizerDescriptionString;
-//    sanitizerDescriptionString << "Sanitizer Tower\nCost: " << prices::SANITIZER_PRICE
-//                               << "\nFires squirts of sanitizer.";
-//    sanitizerDescription.setString(sanitizerDescriptionString.str());
-//    sanitizerDescription.setFillColor(sf::Color::White);
-//
-//    // Game messages to the player
-//    messageText.setFont(descriptionFont);
-//    messageText.setPosition(sanitizerSelection.getPosition()
-//                            + sf::Vector2f(0.f, game_map::SIDE_FLT + draw::SPACER));
-//    messageText.setCharacterSize(game_map::SIDE_PIX / 4);
-//    messageText.setString(messages::ROUND_MESSAGES[0]);
-//    messageText.setFillColor(sf::Color::White);
-//
-//    //loading textures for bullets
-//    sf::Texture squirtTexture;
-//    loadTexture(squirtTexture, std::string(game_map::RESOURCE_PATH + "sanitizer_squirt_rect.png"));
-//    sf::Texture bubbleTexture;
-//    loadTexture(bubbleTexture, std::string(game_map::RESOURCE_PATH
-//                                           + "soap_bubbles_transparent.png"));
-//
-//    //loading sounds
-//    sf::SoundBuffer squirtBuffer;
-//    loadSound(squirtBuffer, std::string(game_map::RESOURCE_PATH + "squirt_sound.wav"));
-//    sf::Sound squirtSound;
-//    squirtSound.setBuffer(squirtBuffer);
-//
-//    sf::SoundBuffer mouseClickBuffer;
-//    loadSound(mouseClickBuffer, std::string(game_map::RESOURCE_PATH + "mouse_click.wav"));
-//    sf::Sound mouseClickSound;
-//    mouseClickSound.setBuffer(mouseClickBuffer);
-//
-//    sf::SoundBuffer wrongClickBuffer;
-//    loadSound(wrongClickBuffer, std::string(game_map::RESOURCE_PATH + "wrong.wav"));
-//    sf::Sound wrongClickSound;
-//    wrongClickSound.setBuffer(wrongClickBuffer);
-//
-//    sf::SoundBuffer cashRegisterBuffer;
-//    loadSound(cashRegisterBuffer, std::string(game_map::RESOURCE_PATH + "cash_register.wav"));
-//    sf::Sound cashRegisterSound;
-//    cashRegisterSound.setBuffer(cashRegisterBuffer);
-//
-//    // indicators for tower placement
-//    soapIndicator.getRect().setTexture(&soapTexture);
-//    soapIndicator.getRect().setTextureRect(soapAnimation.uvRect);
-//    soapIndicator.getRect().setOrigin(sf::Vector2f(game_map::SIDE_FLT / 2.f,
-//                                                   game_map::SIDE_FLT / 2.f));
-//    sanitizerIndicator.getRect().setTexture(&sanitizerTexture);
-//    sanitizerIndicator.getRect().setTextureRect(sanitizerAnimation.uvRect);
-//    sanitizerIndicator.getRect().setOrigin(sf::Vector2f(game_map::SIDE_FLT / 2.f,
-//                                                        game_map::SIDE_FLT / 2.f));
-//}
-
-
 void GamePlayScreen::draw(sf::RenderWindow& window) {
     player.setDrawOrigin(draw::PLAYER_DRAW_ORIGIN);
+
+    bool backDoor = (player.getName() == std::string("backdoor") ? true : false);
+
+
     //MAP MAIN STUFF**********************************************************
 
     GameMap gameMap(std::string("map_1_data"), draw::GAME_MAP_ORIGIN);
@@ -251,25 +64,19 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
     std::string covidTextureFile(game_map::RESOURCE_PATH + "covid_1.png");
     loadTexture(covidTexture, covidTextureFile);
 
-
-    sf::Sprite covid;
-    covid.setTexture(covidTexture);
     sf::Vector2u covidCoords = gameMap.getStartCoords();
 
     Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
-    covid.setPosition(draw::GAME_MAP_ORIGIN + pathPtr->getPosition());
 
-    covid.setScale(game_map::SPRITE_SCALE);
-
+    Corona tempEnemy(&covidTexture, &gameMap, pathPtr);
     const float COVID_SPEED = 0.05f;
 
     sf::Vector2f covidDirection;
     sf::Vector2f covidDestination = draw::GAME_MAP_ORIGIN + pathPtr->getNextPosition();
-    sf::Vector2f distanceToDestination(std::abs(covidDestination.x - covid.getPosition().x),
-                                       std::abs(covidDestination.y - covid.getPosition().y));
+    sf::Vector2f distanceToDestination(std::abs(covidDestination.x - tempEnemy.getSprite().getPosition().x),
+                                       std::abs(covidDestination.y - tempEnemy.getSprite().getPosition().y));
 
     bool drawCovid = true;
-    bool deadCovid = false;
     //MAP MAIN STUFF**********************************************************
 
     bool paused = true;
@@ -292,9 +99,8 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
     std::vector<Bullet> bulletVec;
     std::vector<Tower> towerVec;
     std::vector<Tower> shootingTowers;
-    std::queue<sf::Sprite> enemyQueue;
-    std::queue<sf::Vector2f> distanceToDestinationQueue;
-    std::queue<sf::Vector2f> destinationQueue;
+    std::deque<Corona> enemyQueue;
+    enemyQueue.push_back(tempEnemy);
     bool drawBullets = false;
     bool sanitizerShooting = false;
     bool soapShooting = false;
@@ -808,93 +614,131 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
 
             // Update enemies, bullets (only update while game is not paused)
             if (!paused) {
-                if (drawCovid) {
-                    // Check if the covid has made it to next path
-                    distanceToDestination
-                        = sf::Vector2f(abs(covidDestination.x - covid.getPosition().x),
-                                       abs(covidDestination.y - covid.getPosition().y));
-                    if (std::abs(distanceToDestination.x) < 1.f
+                for (auto& i : enemyQueue) {
+                    if (i.getDrawCovid()) {
+                        // Get values from the object
+                        distanceToDestination = i.getDistanceToDestination();
+                        covidDestination = i.getCovidDestination();
+                        covidDirection = i.getCovidDirection();
+                        covidCoords = i.getCovidCoords();
+                        // Update and modify these values
+                        // Check if the covid has made it to next path
+                        distanceToDestination = sf::Vector2f(abs(covidDestination.x - i.getSprite().getPosition().x),
+                                                             abs(covidDestination.y - i.getSprite().getPosition().y));
+                        if (std::abs(distanceToDestination.x) < 1.f
                             && std::abs(distanceToDestination.y) < 1.f) {
-                        covidCoords = pathPtr->getNextCoords();
-                        pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x]
-                                                                        [covidCoords.y]);
-                        covidDestination = draw::GAME_MAP_ORIGIN + pathPtr->getNextPosition();
-                        // Check if covid has made it to the end
-                        if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
-                            drawCovid = false;
-                        }
-                    }
-
-
-                    // Move the covid
-                    covidDirection = normalize(covidDestination - covid.getPosition());
-                    covid.move(COVID_SPEED * covidDirection);
-                }
-                // update shooting
-                for (unsigned i = 0; i < towerVec.size(); ++i) //pass in enemies that are in the tower's range
-                {
-
-
-                    unsigned startRow = 0; //these coordinates indicate a tower's range (which cells it can attack bullets in)
-                    unsigned endRow = 0; //the tower's range is the surrounding cells (the 3x3 section with the tower at its center)
-                    unsigned startCol = 0;
-                    unsigned endCol = 0;
-
-                    if (towerVec[i].getGroundLocation()->getCoords().x == 0)
-                    {
-                        startRow = 0;
-                    }
-                    else startRow = towerVec[i].getGroundLocation()->getCoords().x - 1;
-
-                    if (towerVec[i].getGroundLocation()->getCoords().x == 7)
-                    {
-                        endRow = 7;
-                    }
-                    else endRow = towerVec[i].getGroundLocation()->getCoords().x + 1;
-
-                    if (towerVec[i].getGroundLocation()->getCoords().y == 0)
-                    {
-                        startCol = 0;
-                    }
-                    else startCol = towerVec[i].getGroundLocation()->getCoords().y - 1;
-
-                    if (towerVec[i].getGroundLocation()->getCoords().y == 7)
-                    {
-                        endCol = 7;
-                    }
-                    else endCol = towerVec[i].getGroundLocation()->getCoords().y + 1;
-
-                    for (int r = startRow; r <= endRow; r++)
-                    {
-                        for (int c = startCol; c <= endCol; c++)
-                        {
-                            if (towerVec[i].shouldShoot() == true && towerVec[i].getHaveTarget() == false &&
-                                Collision::PixelPerfectTest(covid, gameMap.getCells()[r][c]->getSprite())
-                                && drawCovid)
-                                //check if enemy is in range, if there has been a good enough gap between the last bullet shot, and if the tower already has a target or not
-                            {
-                                //generate bullets (squirt dimensions: 17x4, bubble dimensions: 75x33)
-                                if (towerVec[i].getType() == "sanitizer")
-                                {
-                                    Bullet newBullet("squirt", towerVec[i].getX() + towerVec[i].getOffsetX(),
-                                        towerVec[i].getY() + towerVec[i].getOffsetY(), (covid.getPosition().x + (game_map::SIDE_PIX / 2))
-                                        , (covid.getPosition().y + (game_map::SIDE_PIX / 2))); //shoot at first enemy in range, pass in tower for starting location of bullet
-                                    newBullet.getSprite().setTexture(squirtTexture);
-                                    bulletVec.push_back(newBullet);
-                                    sanitizerShooting = true;
-                                }
-                                else //soap
-                                {
-                                    Bullet newBullet("bubble", towerVec[i].getX() + towerVec[i].getOffsetX(),
-                                        towerVec[i].getY() + towerVec[i].getOffsetY(), (covid.getPosition().x + (game_map::SIDE_PIX / 2))
-                                        , (covid.getPosition().y + (game_map::SIDE_PIX / 2))); //shoot at first enemy, pass in tower for starting position
-                                    newBullet.getSprite().setTexture(bubbleTexture); //add game_map::SIDE_PIX / 2 to the enemy coords so the bullet shoots at enemy's center
-                                    bulletVec.push_back(newBullet);
-                                    soapShooting = true;
-                                }
-                                towerVec[i].setHaveTarget(true);
+                            pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x]
+                                                                            [covidCoords.y]);
+                            covidCoords = pathPtr->getNextCoords();
+                            pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x]
+                                                                            [covidCoords.y]);
+                            covidDestination = draw::GAME_MAP_ORIGIN + pathPtr->getNextPosition();
+                            // Check if covid has made it to the end
+                            if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
+                                i.setDrawCovid(false);
+                                player.loseLives(1);
                             }
                         }
+                        covidDirection = normalize(covidDestination - i.getSprite().getPosition());
+                        i.getSprite().move(i.getMoveSpeed() * covidDirection);
+                        // Update the enemy object
+                        i.setDistanceToDestination(distanceToDestination);
+                        i.setCovidCoords(covidCoords);
+                        i.setCovidDestination(covidDestination);
+                        i.setCovidDirection(covidDirection);
+                    }
+                }
+
+                // update shooting
+                if (!enemyQueue.empty()) {
+
+                    sf::Sprite covid = enemyQueue.front().getSprite();
+
+                    for (unsigned i = 0; i < towerVec.size(); ++i) //pass in enemies that are in the tower's range
+                    {
+
+
+                        unsigned startRow = 0; //these coordinates indicate a tower's range (which cells it can attack bullets in)
+                        unsigned endRow = 0; //the tower's range is the surrounding cells (the 3x3 section with the tower at its center)
+                        unsigned startCol = 0;
+                        unsigned endCol = 0;
+
+                        if (towerVec[i].getGroundLocation()->getCoords().x == 0)
+                        {
+                            startRow = 0;
+                        }
+                        else startRow = towerVec[i].getGroundLocation()->getCoords().x - 1;
+
+                        if (towerVec[i].getGroundLocation()->getCoords().x == 7)
+                        {
+                            endRow = 7;
+                        }
+                        else endRow = towerVec[i].getGroundLocation()->getCoords().x + 1;
+
+                        if (towerVec[i].getGroundLocation()->getCoords().y == 0)
+                        {
+                            startCol = 0;
+                        }
+                        else startCol = towerVec[i].getGroundLocation()->getCoords().y - 1;
+
+                        if (towerVec[i].getGroundLocation()->getCoords().y == 7)
+                        {
+                            endCol = 7;
+                        }
+                        else endCol = towerVec[i].getGroundLocation()->getCoords().y + 1;
+
+                        for (int r = startRow; r <= endRow; r++)
+                        {
+                            for (int c = startCol; c <= endCol; c++)
+                            {
+
+                                if (towerVec[i].shouldShoot() == true && towerVec[i].getHaveTarget() == false &&
+                                    Collision::PixelPerfectTest(covid, gameMap.getCells()[r][c]->getSprite())
+                                    && enemyQueue.front().getDrawCovid())
+                                    //check if enemy is in range, if there has been a good enough gap between the last bullet shot, and if the tower already has a target or not
+                                {
+                                    //generate bullets (squirt dimensions: 17x4, bubble dimensions: 75x33)
+                                    if (towerVec[i].getType() == "sanitizer")
+                                    {
+                                        Bullet newBullet("squirt", towerVec[i].getX() + towerVec[i].getOffsetX(),
+                                            towerVec[i].getY() + towerVec[i].getOffsetY(), (covid.getPosition().x + (game_map::SIDE_PIX / 2))
+                                            , (covid.getPosition().y + (game_map::SIDE_PIX / 2))); //shoot at first enemy in range, pass in tower for starting location of bullet
+                                        newBullet.getSprite().setTexture(squirtTexture);
+                                        bulletVec.push_back(newBullet);
+                                        sanitizerShooting = true;
+                                    }
+                                    else //soap
+                                    {
+                                        Bullet newBullet("bubble", towerVec[i].getX() + towerVec[i].getOffsetX(),
+                                            towerVec[i].getY() + towerVec[i].getOffsetY(), (covid.getPosition().x + (game_map::SIDE_PIX / 2))
+                                            , (covid.getPosition().y + (game_map::SIDE_PIX / 2))); //shoot at first enemy, pass in tower for starting position
+                                        newBullet.getSprite().setTexture(bubbleTexture); //add game_map::SIDE_PIX / 2 to the enemy coords so the bullet shoots at enemy's center
+                                        bulletVec.push_back(newBullet);
+                                        soapShooting = true;
+                                    }
+                                    towerVec[i].setHaveTarget(true);
+                                }
+                            }
+                        }
+                    }
+                    // update bullets
+                    for (unsigned i = 0; i < bulletVec.size(); i++) {
+                        bulletVec[i].fire();
+
+                        if (Collision::PixelPerfectTest(bulletVec[i].getSprite(), covid))
+                        {
+                            enemyQueue.front().lowerHealth();
+                            if (!enemyQueue.front().getIsAlive()) {
+                                enemyQueue.pop_front();
+                            }
+                            bulletVec.erase(bulletVec.begin() + i);
+                        }
+
+                        if ((bulletVec[i].getLeft() + bulletVec[i].getSprite().getScale().x < -50 ||
+                            (bulletVec[i].getTop() + bulletVec[i].getSprite().getScale().y > ((8 * game_map::SIDE_PIX) + 50))))
+                            {
+                                bulletVec.erase(bulletVec.begin() + i);
+                            } //remove the bullet from vector if it goes off screen
                     }
                 }
 
@@ -903,23 +747,7 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                     i.incrementShootingGap();
                 }
 
-                // update bullets
-                for (unsigned i = 0; i < bulletVec.size(); i++) {
-                    bulletVec[i].fire();
 
-                    if (Collision::PixelPerfectTest(bulletVec[i].getSprite(), covid))
-                    {
-                        covid.setColor(sf::Color::Transparent);
-                        drawCovid = false;
-                        bulletVec.erase(bulletVec.begin() + i);
-                    }
-
-                    if ((bulletVec[i].getLeft() + bulletVec[i].getSprite().getScale().x < -50 ||
-                        (bulletVec[i].getTop() + bulletVec[i].getSprite().getScale().y > ((8 * game_map::SIDE_PIX) + 50))))
-                        {
-                            bulletVec.erase(bulletVec.begin() + i);
-                        } //remove the bullet from vector if it goes off screen
-                }
 
             }
 
@@ -942,8 +770,10 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
 
             // Drawing
             gameMap.draw(window);
-            if (drawCovid) {
-                window.draw(covid);
+            for (auto i = enemyQueue.begin(); i != enemyQueue.end(); ++i) {
+                if (i->getDrawCovid()) {
+                    window.draw(i->getSprite());
+                }
             }
 
 

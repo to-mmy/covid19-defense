@@ -63,9 +63,21 @@ void GameOverScreen::draw(sf::RenderWindow & window)
 
 void GameOverScreen::displayEnd(sf::RenderWindow &window) {
     bool exitFlag = false;
+    sf::Vector2f mouse;
+    sf::Event event;
     while (!exitFlag)
     {
-        sf::Vector2f mouse(sf::Mouse::getPosition(window));
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                case sf::Event::Closed:
+                    exitFlag = true;
+                    selectedItemIndex = 2;
+                    break;
+                default:
+                    break;
+            }
+        }
+        mouse = sf::Vector2f(sf::Mouse::getPosition(window));
         if (backButton.getGlobalBounds().contains(mouse))
         {
             backButton.setFillColor(sf::Color::Red);

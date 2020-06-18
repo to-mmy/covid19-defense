@@ -39,6 +39,18 @@ int main(){
 
         int choice = menu.displayMenu(window);
         if(choice == 0){ // play
+
+            //test for the player score
+            HighScoreList highScoreList;
+            PlayerData p1, p2;
+            p1.setScore(12345);
+            p2.setScore(10000);
+            p2.setName("Player 2");
+
+            highScoreList.insertNode(p1); // insert as the descending order
+            highScoreList.insertNode(p2);
+            highScoreList.writeToFile(ResourcePath +"highscore.txt");
+
             // start game
             // call game
                 // during game, if die,
@@ -50,7 +62,7 @@ int main(){
 
         } else if (choice == 1){ // high score
             HighscoreScreen hSScreen(window);
-            hSScreen.draw(window);
+            choice = hSScreen.draw(window);
         } else if (choice == 2) { // exit
             window.close();
         }

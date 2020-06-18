@@ -33,6 +33,7 @@ private:
 public:
     // Constructor from file, default arg for drawOrigin is (0, 0)
     GameMap(const std::string& mapFileName, const sf::Vector2f& drOrigin = sf::Vector2f(0.f, 0.f));
+    GameMap(const GameMap&) = delete;
     ~GameMap();
 
     // Setters
@@ -45,6 +46,7 @@ public:
     sf::Vector2u getStartCoords() const { return startCoords; }
     sf::Vector2u getExitCoords() const { return exitCoords; }
     sf::Vector2f getDrawOrigin() const { return drawOrigin; }
+    sf::FloatRect getGlobalBounds() const;
 
     // Draw to a RenderWindow.
     void draw(sf::RenderWindow& window) const;

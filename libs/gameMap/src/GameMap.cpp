@@ -286,6 +286,15 @@ GameMap::~GameMap() {
     cells = nullptr;
 }
 
+// Return the boundaries of the game map as a Rect object
+sf::FloatRect GameMap::getGlobalBounds() const {
+    return sf::FloatRect(drawOrigin,
+                         sf::Vector2f(game_map::SIDE_FLT * static_cast<float>(sideLength),
+                                      game_map::SIDE_FLT * static_cast<float>(sideLength)
+                                      )
+                         );
+}
+
 // Draw to a RenderWindow
 void GameMap::draw(sf::RenderWindow& window) const {
     for (unsigned i = 0; i < sideLength; ++i) {

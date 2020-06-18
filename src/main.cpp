@@ -17,11 +17,25 @@
 #include "GamePlayScreen.h"
 // add resouce path
 //string ResourcePath = "/Users/fkk/Desktop/resources/";
+namespace menu {
+    const int NUM_OF_MENU_CHOICES = 3;
+    const std::string RESOURCE_PATH = "resources\\";
+}
+
 void readFromFile(std::string inFilename, HighScoreList &highScoreList);
 
 ///////// main /////////////
 int main(){
     sf::RenderWindow window(sf::VideoMode(draw::WINDOW_WIDTH, draw::WINDOW_HEIGHT), "COVID-19 Defense");
+
+    // load music
+    sf::Music backgroundMusic;
+
+    if (!backgroundMusic.openFromFile(menu::RESOURCE_PATH + "background-scifi.ogg"))
+        std::cout << "Can't load the background music" << std::endl;
+
+    backgroundMusic.setVolume(50);
+    backgroundMusic.play();
 
     // menu
     MainMenuScreen menu(window.getSize().x, window.getSize().y);

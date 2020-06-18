@@ -27,7 +27,7 @@ class Corona : public enemyBase{
 
 public:
     Corona(){}
-    Corona(sf::Texture* textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr);
+    Corona(sf::Texture* textureIn, GameMap *gameMap, Path*& pathPtr);
     ~Corona(){}
 
     // getter/setters
@@ -54,7 +54,7 @@ public:
     sf::Vector2u getCovidCoords(){return covidCoords;}
 };
 
-Corona::Corona(sf::Texture* textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_ORIGIN, Path* pathPtr) : movespeed (0.05f), enemyBase() {
+Corona::Corona(sf::Texture* textureIn, GameMap *gameMap, Path*& pathPtr) : enemyBase(), movespeed (0.05f) {
     sprite.setTexture(*textureIn);
 
 /**/
@@ -64,15 +64,14 @@ Corona::Corona(sf::Texture* textureIn, GameMap *gameMap, sf::Vector2f GAME_MAP_O
     sf::Vector2u newCovidCoords(gameMap->getStartCoords());
     covidCoords = newCovidCoords;
 
-    sprite.setPosition(GAME_MAP_ORIGIN + pathPtr->getPosition());
+    sprite.setPosition(draw::GAME_MAP_ORIGIN + pathPtr->getPosition());
 
-    pathPtr = dynamic_cast<Path*>(gameMap->getCells()[covidCoords.x][covidCoords.y]);
+    sprite.setScale(game_map::SPRITE_SCALE);
 
+    covidDestination = draw::GAME_MAP_ORIGIN + pathPtr->getNextPosition();
 
-    //covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
-    //                                                               game_map::SIDE_FLT);
     distanceToDestination = sf::Vector2f(std::abs(covidDestination.x - sprite.getPosition().x),
-                                       std::abs(covidDestination.y - sprite.getPosition().y));
+                                         std::abs(covidDestination.y - sprite.getPosition().y));
 
     drawCovid = true;
 

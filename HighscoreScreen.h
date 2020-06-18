@@ -7,11 +7,11 @@
 #include "SFML/Graphics.hpp"
 #include<string>
 
-const string ResourcePaths = "/Users/fkk/Desktop/resources/";
-
 const int numScores = 10;
+
 class HighscoreScreen {
 private:
+    int selectedItemIndex;
     sf::Font hsFont;
     sf::Text hsName;
     sf::Text exitButton;
@@ -19,7 +19,7 @@ private:
 public:
     HighscoreScreen(sf::RenderWindow &window);
     ~HighscoreScreen(){};
-    void draw(sf::RenderWindow& window);
+    int draw(sf::RenderWindow& window);
 };
 HighscoreScreen::HighscoreScreen(sf::RenderWindow &window) {
     if (!hsFont.loadFromFile(ResourcePath + "Jingle Bells.ttf"))
@@ -38,9 +38,9 @@ HighscoreScreen::HighscoreScreen(sf::RenderWindow &window) {
     exitButton.setFillColor(sf::Color::Red);
     exitButton.setPosition(((window.getSize().x - hsName.getGlobalBounds().width) / 2.0), (window.getSize().y - 100));
 }
-void HighscoreScreen::draw(sf::RenderWindow & window)
+int HighscoreScreen::draw(sf::RenderWindow & window)
 {
-
+    selectedItemIndex = -1;
     std::ifstream fin(ResourcePath + "highscore.txt");
     std::string line;
     if(!fin){
@@ -62,16 +62,19 @@ void HighscoreScreen::draw(sf::RenderWindow & window)
 
 
     bool exitFlag = false;
+
     sf::Vector2f mouse;
     sf::Event event;
     while (!exitFlag)
     {
-        while (window.pollEvent(event)){
-            switch (event.type){
+        while (window.pollEvent(event)) {
+            switch (event.type) {
                 case sf::Event::Closed:
                     exitFlag = true;
+                    selectedItemIndex = 2; // in main
                     break;
-                default: break;
+                default:
+                    break;
             }
         }
         mouse = sf::Vector2f(sf::Mouse::getPosition(window));
@@ -96,6 +99,7 @@ void HighscoreScreen::draw(sf::RenderWindow & window)
         window.draw(exitButton);
         window.display();
     }
+    return selectedItemIndex;
 }
 
 

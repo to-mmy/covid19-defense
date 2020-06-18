@@ -9,6 +9,8 @@
 #include <string>
 #include <cmath>
 
+# include "corona.h"
+
 sf::Vector2f normalize(const sf::Vector2f& vec);
 
 int main()
@@ -99,7 +101,7 @@ int main()
         }
     }
 
-
+/*
     sf::Sprite covid;
     covid.setTexture(covidTexture);
     sf::Vector2u covidCoords = gameMap.getStartCoords();
@@ -119,6 +121,33 @@ int main()
     bool drawCovid = true;
     //covid.setPosition(getCellPositionFromCoordinates(pathPtr->getNextCoords(), SIDE_FLT));
 
+*/
+
+/**/
+    // Create coronavirus object
+    Corona coronavirus(covidTexture, gameMap, GAME_MAP_ORIGIN);
+
+
+
+/*      Moving all of this stuff to the enemy classes
+    sf::Sprite covid;
+    covid.setTexture(covidTexture);
+    sf::Vector2u covidCoords = gameMap.getStartCoords();
+    covid.setPosition(getCellPositionFromCoordinates(covidCoords, game_map::SIDE_FLT));
+
+    Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+
+    const float covidSpeed = 0.05f;
+
+    sf::Vector2f covidDirection;
+    sf::Vector2f covidDestination = getCellPositionFromCoordinates(pathPtr->getNextCoords(),
+                                                                   game_map::SIDE_FLT);
+    sf::Vector2f distanceToDestination(std::abs(covidDestination.x - covid.getPosition().x),
+                                       std::abs(covidDestination.y - covid.getPosition().y));
+
+    bool drawCovid = true;
+    //covid.setPosition(getCellPositionFromCoordinates(pathPtr->getNextCoords(), SIDE_FLT));
+*/
 
     // Render loop
     while (window.isOpen())
@@ -130,26 +159,26 @@ int main()
                 window.close();
         }
 
-        if (drawCovid) {
+        if (coronavirus.getDrawCovid()) {
             // Check if the covid has made it to next path
-            distanceToDestination = sf::Vector2f(abs(covidDestination.x - covid.getPosition().x),
-                                                 abs(covidDestination.y - covid.getPosition().y)
-                                                 );
-            if (std::abs(distanceToDestination.x) < 1.f
-                && std::abs(distanceToDestination.y) < 1.f) {
-                covidCoords = pathPtr->getNextCoords();
-                pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
-                covidDestination = GAME_MAP_ORIGIN + pathPtr->getNextPosition();
+            coronavirus.setDistanceToDestination( sf::Vector2f(abs(coronavirus.getCovidDestination().x - coronavirus.getSprite().getPosition().x),
+                                                 abs(coronavirus.getCovidDestination().y - coronavirus.getSprite().getPosition().y)
+                                                 ));
+            if (std::abs(coronavirus.getDistanceToDestination().x) < 1.f
+                && std::abs(coronavirus.getDistanceToDestination().y) < 1.f) {
+                coronavirus.setCovidCoords(coronavirus.getPathPtr()->getNextCoords());
+                coronavirus.setPathPtr( dynamic_cast<Path*>(gameMap.getCells()[coronavirus.getCovidCoords().x][coronavirus.getCovidCoords().y]));
+                coronavirus.setCovidDestination(coronavirus.getPathPtr()->getNextPosition());
                 // Check if covid has made it to the end
-                if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
-                    drawCovid = false;
+                if (coronavirus.getPathPtr()->getNextCoords() == gameMap.getExitCoords()) {
+                    coronavirus.setDrawCovid( false);
                 }
             }
 
 
             // Move the covid
-            covidDirection = normalize(covidDestination - covid.getPosition());
-            covid.move(COVID_SPEED * covidDirection);
+            coronavirus.setCovidDirection(normalize(coronavirus.getCovidDestination() - coronavirus.getSprite().getPosition()));
+            coronavirus.getSprite().move(coronavirus.getMoveSpeed() * coronavirus.getCovidDirection());
         }
 
 
@@ -157,8 +186,8 @@ int main()
         // Draw
         window.clear();
         gameMap.draw(window);
-        if (drawCovid) {
-            window.draw(covid);
+        if (coronavirus.getDrawCovid()) {
+            window.draw(coronavirus.getSprite());
         }
         window.display();
     }

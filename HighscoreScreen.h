@@ -40,7 +40,8 @@ HighscoreScreen::HighscoreScreen(sf::RenderWindow &window) {
 }
 void HighscoreScreen::draw(sf::RenderWindow & window)
 {
-    std::ifstream fin(ResourcePaths + "highscore.txt");
+
+    std::ifstream fin(ResourcePath + "highscore.txt");
     std::string line;
     if(!fin){
         cerr << "Error opening the fin highscore.txt" << endl;
@@ -61,9 +62,19 @@ void HighscoreScreen::draw(sf::RenderWindow & window)
 
 
     bool exitFlag = false;
+    sf::Vector2f mouse;
+    sf::Event event;
     while (!exitFlag)
     {
-        sf::Vector2f mouse(sf::Mouse::getPosition(window));
+        while (window.pollEvent(event)){
+            switch (event.type){
+                case sf::Event::Closed:
+                    exitFlag = true;
+                    break;
+                default: break;
+            }
+        }
+        mouse = sf::Vector2f(sf::Mouse::getPosition(window));
         if (exitButton.getGlobalBounds().contains(mouse))
         {
             exitButton.setFillColor(sf::Color::Red);

@@ -36,7 +36,7 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include <SFML\Graphics.hpp>
+#include <SFML/Graphics.hpp>
 
 namespace Collision {
 	//////

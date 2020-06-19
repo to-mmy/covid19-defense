@@ -11,7 +11,8 @@ private:
 	std::string towerType; //soap or sanitizer
 	bool haveTarget;
 	//Enemy target;
-	double bulletOffsetX; //offset makes it look like the squirt is coming from the bottle nozzle and the bubbles are coming from inside the soap
+	double bulletOffsetX; // offset makes it look like the squirt is coming from the bottle nozzle
+	                      // and the bubbles are coming from inside the soap
 	double bulletOffsetY;
 	bool placedDown;
 	Cell* groundLocation;
@@ -36,7 +37,3 @@ public:
 	std::string getType();
 	void draw(sf::RenderWindow &window);
 };
-
-
-//pass in all of the paths around the tower (i think we should just try to display in the instructions where the tower's range is)
-//read through the enemy queue and get the coordinates of the first one within the tower's range

@@ -2,8 +2,8 @@
 // Created by Kuo Fu.
 //
 
-#ifndef FINALPROJECT_MAINMENUSCREEN_H
-#define FINALPROJECT_MAINMENUSCREEN_H
+#ifndef MAINMENUSCREEN_H
+#define MAINMENUSCREEN_H
 
 #include "HighscoreScreen.h"
 
@@ -13,7 +13,6 @@ namespace menu {
 }
 
 class MainMenuScreen {
-
 private:
     int selectedItemIndex;
     sf::Font font;
@@ -30,8 +29,6 @@ public:
 
     int GetPressedItem() { return selectedItemIndex; }
 
-//    void displayWelcome(sf::RenderWindow &window);
-//    int displayMenu(sf::RenderWindow &window);
     int displayMenu(sf::RenderWindow &window, std::string &playerName);
     std::string displayWelcome(sf::RenderWindow& window);
 
@@ -39,4 +36,4 @@ public:
 
 
 
-#endif //FINALPROJECT_MAINMENUSCREEN_H
+#endif // MAINMENUSCREEN_H

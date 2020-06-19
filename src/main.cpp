@@ -1,3 +1,8 @@
+#include "mainMenuScreen.h"
+#include "HighscoreScreen.h"
+#include "GameOverScreen.h"
+#include "HighScores.h"
+#include "GamePlayScreen.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -10,14 +15,6 @@
 #include <sstream>
 #include <cstring>
 
-// header files
-#include "mainMenuScreen.h"
-#include "HighscoreScreen.h"
-#include "GameOverScreen.h"
-#include "HighScores.h"
-#include "GamePlayScreen.h"
-// add resouce path
-//string ResourcePath = "/Users/fkk/Desktop/resources/";
 namespace menu {
     const int NUM_OF_MENU_CHOICES = 3;
     const std::string RESOURCE_PATH = "resources\\";
@@ -69,8 +66,10 @@ int main(){
             gamePlayScreen.draw(window);
 
             p3 = gamePlayScreen.getPlayer();
-            highScoreList.insertNode(p3);
-            highScoreList.writeToFile(menu::RESOURCE_PATH +"highscore.txt");
+            if (p3.getName() != std::string("backdoor")) {
+                highScoreList.insertNode(p3);
+            }
+            highScoreList.writeToFile(menu::RESOURCE_PATH + "highscore.txt");
 
             if (gamePlayScreen.getWindowClosed()) {
                 window.close();

@@ -1,8 +1,7 @@
 #include "Animation.h"
 #include <iostream>
 
-Animation::Animation()
-{}
+Animation::Animation() {}
 
 Animation::Animation(const Animation& a) {
     this->uvRect.width = a.uvRect.width;
@@ -17,13 +16,12 @@ Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switch
     this->imageCount = imageCount;
     this->switchTime = switchTime;
     totalTime = 0.0f;
-    currentImage.x = 0; //the starting frame for the animation must be in the first column
+    currentImage.x = 0; // the starting frame for the animation must be in the first column
     uvRect.width = texture->getSize().x / float(imageCount.x);
     uvRect.height = texture->getSize().y / float(imageCount.y);
 }
 
-Animation::~Animation()
-{}
+Animation::~Animation() {}
 
 void Animation::Update(int row, float deltaTime) {
     currentImage.y = row;

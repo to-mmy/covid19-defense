@@ -6,18 +6,18 @@
 #include <sstream>
 
 namespace draw {
-    extern const float SPACER;
+extern const float SPACER;
 }
 
 namespace player_data {
-    const int STARTING_MONEY = 500;
-    const int STARTING_LIVES = 100;
-    const std::string FONT_FILE = game_map::RESOURCE_PATH + "Jingle Bells.ttf";
+const int STARTING_MONEY = 500;
+const int STARTING_LIVES = 100;
+const std::string FONT_FILE = game_map::RESOURCE_PATH + "Jingle Bells.ttf";
 }
 
 PlayerData::PlayerData(const std::string& playerName, const sf::Vector2f& drOrigin)
-        : money(player_data::STARTING_MONEY), score(0), lives(player_data::STARTING_LIVES),
-          name(playerName), drawOrigin(drOrigin) {
+    : money(player_data::STARTING_MONEY), score(0), lives(player_data::STARTING_LIVES),
+      name(playerName), drawOrigin(drOrigin) {
     // load the font file
     bool validFile = false;
     std::string input = player_data::FONT_FILE;
@@ -25,18 +25,16 @@ PlayerData::PlayerData(const std::string& playerName, const sf::Vector2f& drOrig
         try {
             if (!font.loadFromFile(input)) {
                 throw 1;
-            }
-            else {
+            } else {
                 validFile = true;
             }
-        }
-        catch (int e) {
+        } catch (int e) {
             switch(e) {
-                case 1:
-                    std::cout << "Error opening file " << input << std::endl;
-                default:
-                    std::cout << "Enter the full file path for the font file: ";
-                    std::getline(std::cin, input);
+            case 1:
+                std::cout << "Error opening file " << input << std::endl;
+            default:
+                std::cout << "Enter the full file path for the font file: ";
+                std::getline(std::cin, input);
             }
         }
     }
@@ -52,18 +50,16 @@ PlayerData::PlayerData(const PlayerData& p) : money(p.money), score(p.score), li
         try {
             if (!font.loadFromFile(input)) {
                 throw 1;
-            }
-            else {
+            } else {
                 validFile = true;
             }
-        }
-        catch (int e) {
+        } catch (int e) {
             switch(e) {
-                case 1:
-                    std::cout << "Error opening file " << input << std::endl;
-                default:
-                    std::cout << "Enter the full file path for the font file: ";
-                    std::getline(std::cin, input);
+            case 1:
+                std::cout << "Error opening file " << input << std::endl;
+            default:
+                std::cout << "Enter the full file path for the font file: ";
+                std::getline(std::cin, input);
             }
         }
     }
@@ -96,7 +92,6 @@ std::ostream& operator<<(std::ostream& out, const PlayerData& obj) {
     return out;
 }
 
-bool PlayerData::operator<(const PlayerData& obj) const
-{
+bool PlayerData::operator<(const PlayerData& obj) const {
     return score > obj.score; // reverse order
 }

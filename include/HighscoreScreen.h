@@ -2,10 +2,10 @@
 // Created by Kuo Fu on 2020-06-14.
 //
 
-#ifndef FINALPROJECT_HIGHSCORESCREEN_H
-#define FINALPROJECT_HIGHSCORESCREEN_H
+#ifndef HIGHSCORESCREEN_H
+#define HIGHSCORESCREEN_H
 #include <SFML/Graphics.hpp>
-#include<string>
+#include <string>
 
 namespace menu {
 extern const std::string RESOURCE_PATH;
@@ -24,11 +24,11 @@ private:
     sf::Text scores[scores::NUM_SCORES];
 public:
     HighscoreScreen(sf::RenderWindow &window);
-    ~HighscoreScreen(){};
+    ~HighscoreScreen() = default;
     int draw(sf::RenderWindow& window);
 };
 
 
 
 
-#endif //FINALPROJECT_HIGHSCORESCREEN_H
+#endif // HIGHSCORESCREEN_H

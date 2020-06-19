@@ -55,9 +55,6 @@ private:
     bool windowClosed; // If the window was closed
 public:
     GamePlayScreen() = default;
-    // Construct from a player name and a map file
-//    GamePlayScreen(const std::string& playerName = "Player 1",
-//                   const std::string& mapFile = "map_1_data");
     ~GamePlayScreen() = default;
     // Draw to a window (takes control of window until gameplay is over)
     void draw(sf::RenderWindow& window);
@@ -75,8 +72,6 @@ public:
     friend void loadTexture(sf::Texture&, const std::string&);
     friend void loadSound(sf::SoundBuffer&, const std::string&);
     friend void loadFont(sf::Font&, const std::string&);
-
-
 };
 
 sf::Vector2f normalize(const sf::Vector2f& vec);

@@ -18,7 +18,7 @@ public:
 	Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime);
 	Animation(const Animation&);
 	~Animation();
-	void Update(int row, float deltaTime); //deltaTime is how long it will take to switch between frames
+	void Update(int row, float deltaTime); //deltaTime is how long it will take to switch frames
 	float getSwitchTime();
 };
 

@@ -8,6 +8,7 @@
 #include <string>
 #include <cctype>
 #include <sstream>
+#include <cstring>
 
 // header files
 #include "mainMenuScreen.h"
@@ -19,7 +20,7 @@
 //string ResourcePath = "/Users/fkk/Desktop/resources/";
 namespace menu {
     const int NUM_OF_MENU_CHOICES = 3;
-    const std::string RESOURCE_PATH = "resources/";
+    const std::string RESOURCE_PATH = "resources\\";
 }
 
 sf::Vector2f normalize(const sf::Vector2f& vec);
@@ -38,7 +39,7 @@ int main(){
     if (!backgroundMusic.openFromFile(menu::RESOURCE_PATH + "background-scifi.ogg"))
         std::cout << "Can't load the background music" << std::endl;
 
-    backgroundMusic.setVolume(50);
+    backgroundMusic.setVolume(5.f);
     backgroundMusic.play();
 
     // menu

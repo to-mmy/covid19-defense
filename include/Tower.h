@@ -15,7 +15,7 @@ private:
 	double bulletOffsetY;
 	bool placedDown;
 	Cell* groundLocation;
-	int shootingGap;
+	int shootingGap = 0;
 public:
 	Tower(sf::Vector2f size, sf::Vector2f coords, std::string type, Cell* location);
 	Cell*& getGroundLocation();

@@ -5,6 +5,7 @@
 #include "corona.h"
 
 #include <deque>
+#include <cstdlib>
 
 namespace draw {
 const sf::Vector2f PLAYER_DRAW_ORIGIN = sf::Vector2f(730.f, 630.f);
@@ -77,7 +78,6 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
     Path* pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
 
     Corona tempEnemy(&covidTexture, &gameMap, pathPtr);
-    const float COVID_SPEED = 0.05f;
 
     sf::Vector2f covidDirection;
     sf::Vector2f covidDestination = draw::GAME_MAP_ORIGIN + pathPtr->getNextPosition();
@@ -91,6 +91,7 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
 
     bool waveGoing = false; // if the wave of enemies is still going
     int waveNumber = 0; //0 through 5
+    int enemiesPushed = 0;
 
     //opening a window
 //    sf::RenderWindow window;
@@ -321,10 +322,6 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
             case sf::Event::Closed:
                 windowClosed = true;
                 break;
-            case sf::Event::LostFocus:
-                paused = true;
-                break;
-
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::L) {
                     lKeyClock.restart();
@@ -451,26 +448,26 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                 }
 
                 if (num1KeyDown == ButtonDown::PRESS && num1KeyPressable) {
-                    waveNumber = 1;
+                    waveNumber = 0;
                     paused = true;
                 }
 
                 if (num2KeyDown == ButtonDown::PRESS && num2KeyPressable) {
-                    waveNumber = 2;
+                    waveNumber = 1;
                     paused = true;
                 }
 
                 if (num3KeyDown == ButtonDown::PRESS && num3KeyPressable) {
-                    waveNumber = 3;
+                    waveNumber = 2;
                     paused = true;
                 }
 
                 if (num4KeyDown == ButtonDown::PRESS && num4KeyPressable) {
-                    waveNumber = 4;
+                    waveNumber = 3;
                     paused = true;
                 }
                 if (num5KeyDown == ButtonDown::PRESS && num5KeyPressable) {
-                    waveNumber = 5;
+                    waveNumber = 4;
                     paused = true;
                 }
 
@@ -585,6 +582,7 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                         playPauseButton.setTexture(&pauseTexture);
                         if (!waveGoing) {
                             waveGoing = true;
+                            ++waveNumber;
                         }
                     }
                     else {
@@ -776,6 +774,120 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
 
             // Update enemies, bullets (only update while game is not paused)
             if (!paused) {
+                // Add enemies to the queue
+                switch (waveNumber) {
+                case 1:
+                    if (enemiesPushed < 20) {
+                        if (!(std::rand() % 2500)) {
+                            // add enemy
+                            covidCoords = gameMap.getStartCoords();
+                            pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+                            Corona tempEnemy(&covidTexture, &gameMap, pathPtr);
+                            enemyQueue.push_back(tempEnemy);
+                            ++enemiesPushed;
+                        }
+                    }
+                    else if (enemyQueue.empty()) {
+                        player.addScore(1000);
+                        player.addMoney(500);
+                        waveGoing = false;
+                        paused = true;
+                        playPauseButton.setTexture(&playTexture);
+                        enemiesPushed = 0;
+                        messageText.setString(messages::ROUND_MESSAGES[waveNumber]);
+                        drawMessageText = true;
+                    }
+                    break;
+                case 2:
+                    if (enemiesPushed < 40) {
+                        if (!(std::rand() % 2100)) {
+                            // add enemy
+                            covidCoords = gameMap.getStartCoords();
+                            pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+                            Corona tempEnemy(&covidTexture, &gameMap, pathPtr);
+                            enemyQueue.push_back(tempEnemy);
+                            ++enemiesPushed;
+                        }
+                    }
+                    else if (enemyQueue.empty()) {
+                        player.addScore(2000);
+                        player.addMoney(500);
+                        waveGoing = false;
+                        paused = true;
+                        playPauseButton.setTexture(&playTexture);
+                        enemiesPushed = 0;
+                        messageText.setString(messages::ROUND_MESSAGES[waveNumber]);
+                        drawMessageText = true;
+                    }
+                    break;
+                case 3:
+                    if (enemiesPushed < 70) {
+                        if (!(std::rand() % 1700)) {
+                            // add enemy
+                            covidCoords = gameMap.getStartCoords();
+                            pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+                            Corona tempEnemy(&covidTexture, &gameMap, pathPtr);
+                            enemyQueue.push_back(tempEnemy);
+                            ++enemiesPushed;
+                        }
+                    }
+                    else if (enemyQueue.empty()) {
+                        player.addScore(3000);
+                        player.addMoney(500);
+                        waveGoing = false;
+                        paused = true;
+                        playPauseButton.setTexture(&playTexture);
+                        enemiesPushed = 0;
+                        messageText.setString(messages::ROUND_MESSAGES[waveNumber]);
+                        drawMessageText = true;
+                    }
+                    break;
+                case 4:
+                    if (enemiesPushed < 100) {
+                        if (!(std::rand() % 1400)) {
+                            // add enemy
+                            covidCoords = gameMap.getStartCoords();
+                            pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+                            Corona tempEnemy(&covidTexture, &gameMap, pathPtr);
+                            enemyQueue.push_back(tempEnemy);
+                            ++enemiesPushed;
+                        }
+                    }
+                    else if (enemyQueue.empty()) {
+                        player.addScore(4000);
+                        player.addMoney(500);
+                        waveGoing = false;
+                        paused = true;
+                        playPauseButton.setTexture(&playTexture);
+                        enemiesPushed = 0;
+                        messageText.setString(messages::ROUND_MESSAGES[waveNumber]);
+                        drawMessageText = true;
+                    }
+                    break;
+                case 5:
+                    if (enemiesPushed < 150) {
+                        if (!(std::rand() % 1100)) {
+                            // add enemy
+                            covidCoords = gameMap.getStartCoords();
+                            pathPtr = dynamic_cast<Path*>(gameMap.getCells()[covidCoords.x][covidCoords.y]);
+                            Corona tempEnemy(&covidTexture, &gameMap, pathPtr);
+                            enemyQueue.push_back(tempEnemy);
+                            ++enemiesPushed;
+                        }
+                    }
+                    else if (enemyQueue.empty()) {
+                        player.addScore(5000);
+                        waveGoing = false;
+                        paused = true;
+                        playPauseButton.setTexture(&playTexture);
+                        enemiesPushed = 0;
+                        gameVictory = true;
+                        gameOver = true;
+                    }
+                    break;
+
+                default: waveNumber = 0;
+                }
                 for (auto& i : enemyQueue) {
                     if (i.getDrawCovid()) {
                         // Get values from the object
@@ -798,6 +910,7 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                             // Check if covid has made it to the end
                             if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
                                 i.setDrawCovid(false);
+                                player.loseScore(50);
                                 if (!unlimitedLives) {
                                     player.loseLives(1);
                                 }
@@ -897,6 +1010,8 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                             enemyQueue.front().lowerHealth();
                             if (!enemyQueue.front().getIsAlive()) {
                                 enemyQueue.pop_front();
+                                player.addScore(100);
+                                player.addMoney(25);
                             }
                             bulletVec.erase(bulletVec.begin() + i);
                         }

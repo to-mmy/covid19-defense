@@ -23,7 +23,7 @@ public:
 
 };
 
-enemyBase::enemyBase() : health(4), isAlive(true) {}
+enemyBase::enemyBase() : health(8), isAlive(true) {}
 
 void enemyBase::lowerHealth(){
     if (health > 0) {

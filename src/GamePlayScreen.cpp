@@ -43,6 +43,12 @@ const std::string ROUND_MESSAGES[5] {
         "One more wave to go. Just one more and\n"
         "you're free. Don't stop now!"
     };
+const std::string BACKDOOR_INSTRUCTIONS {
+        "=====BACKDOOR ENABLED: YOU'RE IN=====\n"
+        "l - enable unlimited lives\n"
+        "m - enable unlimited money\n"
+        "1-5 - set wave number 1-5\n"
+    };
 }
 
 namespace input {
@@ -52,7 +58,9 @@ const float CLICK_DELAY = 0.2f;
 void GamePlayScreen::draw(sf::RenderWindow& window) {
     player.setDrawOrigin(draw::PLAYER_DRAW_ORIGIN);
 
-    bool backDoor = (player.getName() == std::string("backdoor") ? true : false);
+    bool backDoorEnabled = (player.getName() == std::string("backdoor") ? true : false);
+    bool unlimitedLives = false;
+    bool unlimitedMoney = false;
 
 
     //MAP MAIN STUFF**********************************************************
@@ -194,7 +202,12 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
     messageText.setPosition(sanitizerSelection.getPosition()
                             + sf::Vector2f(0.f, game_map::SIDE_FLT + draw::SPACER));
     messageText.setCharacterSize(game_map::SIDE_PIX / 4);
-    messageText.setString(messages::ROUND_MESSAGES[0]);
+    if (backDoorEnabled) {
+        messageText.setString(messages::BACKDOOR_INSTRUCTIONS);
+    }
+    else {
+        messageText.setString(messages::ROUND_MESSAGES[0]);
+    }
     messageText.setFillColor(sf::Color::White);
     bool drawMessageText = true;
 
@@ -251,6 +264,13 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
     sf::Vector2f mouseFloat(mousePos);
 
     // delay timer for mouse click
+    sf::Clock lKeyClock;
+    sf::Clock mKeyClock;
+    sf::Clock num1KeyClock;
+    sf::Clock num2KeyClock;
+    sf::Clock num3KeyClock;
+    sf::Clock num4KeyClock;
+    sf::Clock num5KeyClock;
     sf::Clock spaceKeyClock;
     sf::Clock leftMouseClock;
     sf::Clock rightMouseClock;
@@ -262,8 +282,22 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
     PlaceTower placeWhat = PlaceTower::NONE;
     bool placeTowerConfirmed = false;
 
-
+    // For input events
     sf::Event event;
+    ButtonDown lKeyDown = ButtonDown::RELEASE;
+    bool lKeyPressable = false;
+    ButtonDown mKeyDown = ButtonDown::RELEASE;
+    bool mKeyPressable = false;
+    ButtonDown num1KeyDown = ButtonDown::RELEASE;
+    bool num1KeyPressable = false;
+    ButtonDown num2KeyDown = ButtonDown::RELEASE;
+    bool num2KeyPressable = false;
+    ButtonDown num3KeyDown = ButtonDown::RELEASE;
+    bool num3KeyPressable = false;
+    ButtonDown num4KeyDown = ButtonDown::RELEASE;
+    bool num4KeyPressable = false;
+    ButtonDown num5KeyDown = ButtonDown::RELEASE;
+    bool num5KeyPressable = false;
     ButtonDown spaceKeyDown = ButtonDown::RELEASE;
     bool spaceKeyPressable = false;
     ButtonDown leftMouseDown = ButtonDown::RELEASE;
@@ -292,7 +326,35 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                 break;
 
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Space) {
+                if (event.key.code == sf::Keyboard::L) {
+                    lKeyClock.restart();
+                    lKeyDown = ButtonDown::PRESS;
+                }
+                else if (event.key.code == sf::Keyboard::M) {
+                    mKeyClock.restart();
+                    mKeyDown = ButtonDown::PRESS;
+                }
+                else if (event.key.code == sf::Keyboard::Num1) {
+                    num1KeyClock.restart();
+                    num1KeyDown = ButtonDown::PRESS;
+                }
+                else if (event.key.code == sf::Keyboard::Num2) {
+                    num2KeyClock.restart();
+                    num2KeyDown = ButtonDown::PRESS;
+                }
+                else if (event.key.code == sf::Keyboard::Num3) {
+                    num3KeyClock.restart();
+                    num3KeyDown = ButtonDown::PRESS;
+                }
+                else if (event.key.code == sf::Keyboard::Num4) {
+                    num4KeyClock.restart();
+                    num4KeyDown = ButtonDown::PRESS;
+                }
+                else if (event.key.code == sf::Keyboard::Num5) {
+                    num5KeyClock.restart();
+                    num5KeyDown = ButtonDown::PRESS;
+                }
+                else if (event.key.code == sf::Keyboard::Space) {
                     spaceKeyClock.restart();
                     spaceKeyDown = ButtonDown::PRESS;
                 }
@@ -377,6 +439,98 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
             drawSoapDescription = soapSelectionClickable;
             drawSanitizerDescription = sanitizerSelectionClickable;
 
+            // Backdoor menu items
+            if (backDoorEnabled) {
+
+                if (lKeyDown == ButtonDown::PRESS && lKeyPressable) {
+                    unlimitedLives = unlimitedLives ? false : true;
+                }
+
+                if (mKeyDown == ButtonDown::PRESS && mKeyPressable) {
+                    unlimitedMoney = unlimitedMoney ? false : true;
+                }
+
+                if (num1KeyDown == ButtonDown::PRESS && num1KeyPressable) {
+                    waveNumber = 1;
+                    paused = true;
+                }
+
+                if (num2KeyDown == ButtonDown::PRESS && num2KeyPressable) {
+                    waveNumber = 2;
+                    paused = true;
+                }
+
+                if (num3KeyDown == ButtonDown::PRESS && num3KeyPressable) {
+                    waveNumber = 3;
+                    paused = true;
+                }
+
+                if (num4KeyDown == ButtonDown::PRESS && num4KeyPressable) {
+                    waveNumber = 4;
+                    paused = true;
+                }
+                if (num5KeyDown == ButtonDown::PRESS && num5KeyPressable) {
+                    waveNumber = 5;
+                    paused = true;
+                }
+
+                if (lKeyDown == ButtonDown::RELEASE
+                    && lKeyClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
+                    lKeyPressable = true;
+                }
+                else {
+                    lKeyPressable = false;
+                }
+
+                if (mKeyDown == ButtonDown::RELEASE
+                    && mKeyClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
+                    mKeyPressable = true;
+                }
+                else {
+                    mKeyPressable = false;
+                }
+
+                if (num1KeyDown == ButtonDown::RELEASE
+                    && num1KeyClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
+                    num1KeyPressable = true;
+                }
+                else {
+                    num1KeyPressable = false;
+                }
+
+                if (num2KeyDown == ButtonDown::RELEASE
+                    && num2KeyClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
+                    num2KeyPressable = true;
+                }
+                else {
+                    num2KeyPressable = false;
+                }
+
+                if (num3KeyDown == ButtonDown::RELEASE
+                    && num3KeyClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
+                    num3KeyPressable = true;
+                }
+                else {
+                    num3KeyPressable = false;
+                }
+
+                if (num4KeyDown == ButtonDown::RELEASE
+                    && num4KeyClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
+                    num4KeyPressable = true;
+                }
+                else {
+                    num4KeyPressable = false;
+                }
+
+                if (num5KeyDown == ButtonDown::RELEASE
+                    && num5KeyClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
+                    num5KeyPressable = true;
+                }
+                else {
+                    num5KeyPressable = false;
+                }
+            }
+
             // space key pauses game
             if (spaceKeyDown == ButtonDown::PRESS && spaceKeyPressable
                 && playPauseClock.getElapsedTime().asSeconds() > input::CLICK_DELAY) {
@@ -385,7 +539,9 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
 
                 playPauseClock.restart();
                 // Round messages will go away when player clicks play
-                drawMessageText = false;
+                if (!backDoorEnabled) {
+                    drawMessageText = false;
+                }
                 if (paused) {
                     paused = false;
                     playPauseButton.setFillColor(sf::Color::Red);
@@ -420,7 +576,9 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                     mouseClickSound.play();
 
                     // Round messages will go away when player clicks play
-                    drawMessageText = false;
+                    if (!backDoorEnabled) {
+                        drawMessageText = false;
+                    }
                     if (paused) {
                         paused = false;
                         playPauseButton.setFillColor(sf::Color::Red);
@@ -441,7 +599,7 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                     // Restart the clickable timer
                     sanitizerSelectionClock.restart();
 
-                    if (player.getMoney() >= prices::SANITIZER_PRICE) {
+                    if (player.getMoney() >= prices::SANITIZER_PRICE || unlimitedMoney) {
                         // Play the click sound
                         mouseClickSound.play();
 
@@ -460,7 +618,7 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                     // Restart the clickable timer
                     soapSelectionClock.restart();
 
-                    if (player.getMoney() >= prices::SOAP_PRICE) {
+                    if (player.getMoney() >= prices::SOAP_PRICE || unlimitedMoney) {
                         //Play the click sound
                         mouseClickSound.play();
                         placeWhat = PlaceTower::SOAP;
@@ -543,7 +701,9 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                         towerVec.push_back(t);
 
                         // Pay for the tower
-                        player.loseMoney(prices::SANITIZER_PRICE);
+                        if (!unlimitedMoney) {
+                            player.loseMoney(prices::SANITIZER_PRICE);
+                        }
                         cashRegisterSound.play();
 
                         // reset values
@@ -587,7 +747,9 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                         towerVec.push_back(t);
 
                         // Pay for the tower
-                        player.loseMoney(prices::SOAP_PRICE);
+                        if (!unlimitedMoney) {
+                            player.loseMoney(prices::SOAP_PRICE);
+                        }
                         cashRegisterSound.play();
 
                         // reset values
@@ -636,7 +798,12 @@ void GamePlayScreen::draw(sf::RenderWindow& window) {
                             // Check if covid has made it to the end
                             if (pathPtr->getNextCoords() == gameMap.getExitCoords()) {
                                 i.setDrawCovid(false);
-                                player.loseLives(1);
+                                if (!unlimitedLives) {
+                                    player.loseLives(1);
+                                }
+                                if (player.getLives() == 0) {
+                                    gameOver = true;
+                                }
                             }
                         }
                         covidDirection = normalize(covidDestination - i.getSprite().getPosition());

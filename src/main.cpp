@@ -56,7 +56,7 @@ int main(){
             highScoreList.writeToFile(menu::RESOURCE_PATH +"highscore.txt");
 
             PlayerData p3;
-            p3.setName("Game Player");
+            p3.setName("backdoor");
 
             GamePlayScreen gamePlayScreen;
             gamePlayScreen.setPlayer(p3);

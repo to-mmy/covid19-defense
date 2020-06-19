@@ -17,34 +17,20 @@
 #include "GamePlayScreen.h"
 // add resouce path
 //string ResourcePath = "/Users/fkk/Desktop/resources/";
-namespace menu {
-    const int NUM_OF_MENU_CHOICES = 3;
-    const std::string RESOURCE_PATH = "resources/";
-}
 
 sf::Vector2f normalize(const sf::Vector2f& vec);
 void loadTexture(sf::Texture&, const std::string&);
 void loadSound(sf::SoundBuffer&, const std::string&);
 void loadFont(sf::Font&, const std::string&);
-void readFromFile(std::string inFilename, HighScoreList &highScoreList);
 
 ///////// main /////////////
 int main(){
     sf::RenderWindow window(sf::VideoMode(draw::WINDOW_WIDTH, draw::WINDOW_HEIGHT), "COVID-19 Defense");
 
-//     load music
-    sf::Music backgroundMusic;
-
-    if (!backgroundMusic.openFromFile(menu::RESOURCE_PATH + "background-scifi.ogg"))
-        std::cout << "Can't load the background music" << std::endl;
-
-    backgroundMusic.setVolume(50);
-    backgroundMusic.play();
-
     // menu
     MainMenuScreen menu(window.getSize().x, window.getSize().y);
 
-    HighScoreList highScoreList;
+            HighScoreList highScoreList;
     while(window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)){
@@ -55,13 +41,22 @@ int main(){
                 default: break;
             }
         }
-        std::string playername = "play 1"; // for template
-        int choice = menu.displayMenu(window, playername); ///////// get the player name during display menu
+
+        int choice = menu.displayMenu(window);
         if(choice == 0){ // play
 
             //test for the player score
+            PlayerData p1, p2;
+            p1.setScore(12345);
+            p2.setScore(10000);
+            p2.setName("Player 2");
+
+            highScoreList.insertNode(p1); // insert as the descending order
+            highScoreList.insertNode(p2);
+            highScoreList.writeToFile(menu::RESOURCE_PATH +"highscore.txt");
+
             PlayerData p3;
-            p3.setName(playername); /// set the player name as the user input
+            p3.setName("backdoor");
 
             GamePlayScreen gamePlayScreen;
             gamePlayScreen.setPlayer(p3);
@@ -76,7 +71,7 @@ int main(){
             }
             else if (gamePlayScreen.getGameOver()) {
                 GameOverScreen gameOverScreen(window);
-                gameOverScreen.displayEnd(window, p3);
+                gameOverScreen.displayEnd(window);
             }
 
         } else if (choice == 1){ // high score
@@ -172,38 +167,5 @@ void loadFont(sf::Font& font, const std::string& fileName) {
 }
 
 
-void readFromFile(std::string inFilename, HighScoreList &highScoreList) {
-    std::ifstream infile;
-    char name[13];
-    int score;
 
-    infile.open(inFilename);
-    if(!infile){
-        std::cout << "Error happened to open the input file!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-
-
-    while(!infile.eof()){
-        infile.read(name, 12);
-        infile >> score;
-        infile.ignore();
-
-        // trim trailing spaces
-        name[12] = 0;
-        // right trim extra white space
-        size_t size = strlen(name);
-        for (int i = size - 1; i > 0; --i)
-        {
-            if (!isspace(name[i])) break;
-            else name[i] = 0;
-        }
-        PlayerData pData;
-        pData.setName(name);
-        pData.setScore(score);
-        highScoreList.insertNode(pData);
-    }
-    infile.close();
-}
 

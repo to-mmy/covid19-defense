@@ -1,6 +1,10 @@
 # CIS29Project
 ## CIS29 Project: COVID-19 Defense Game
-Members: Thomas Zhang (to-mmy), Jonathan Ly (jtlystudent0), Rohan Shroti (suburbanSadness), kuo fu (kkfkiera).
+Members:
+- Co-Group Lead: Thomas Zhang (to-mmy)
+- Co-Group Lead: Jonathan Ly (jtlystudent0)
+- Rohan Shroti (suburbanSadness)
+- kuo fu (kkfkiera)
 
 A group project to create a game using the SFML libraries over the course of a quarter.
 
